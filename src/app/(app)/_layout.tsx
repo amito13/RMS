@@ -1,5 +1,13 @@
 import { Stack } from 'expo-router';
 
+import { useTheme } from '@/theme';
+
 export default function AppLayout() {
-  return <Stack />;
+  const { colors } = useTheme();
+  return (
+    <Stack
+      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
 }

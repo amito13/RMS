@@ -115,6 +115,8 @@ A typical landlord with 5 to 50 tenants across a few buildings:
 
 Priorities used in this document: **P0** = must ship in MVP, **P1** = ships shortly after MVP, **P2** = later.
 
+**Exception:** the Notifications row (section 8) is built right after the MVP, as milestone M5, even though it's marked P0. Until then, the Today screen shows everything that's due, overdue or moving out.
+
 | Area | P0 (MVP) | P1 | P2 |
 |------|----------|----|----|
 | Auth | Email + password, forgot password, sign out | Delete account | Biometric app lock |
@@ -924,11 +926,15 @@ Also needed: an EAS project ID in `app.json` (`extra.eas.projectId`), FCM creden
 
 | Milestone | Scope | Exit criteria |
 |-----------|-------|---------------|
-| M1. Foundation | Supabase project, schema, RLS, storage bucket, auth screens, tab layout, EAS dev build | Landlord can sign up and sign in on a dev build on Android and iOS |
+**Push notifications come after the MVP.** The MVP (M1 to M4) is the full app without push: the Today screen is how the landlord sees who to collect from. Push (M5) is added once the MVP works, because it needs Firebase set up (`google-services.json`) and a new development build.
+
+| Milestone | Scope | Exit criteria |
+|-----------|-------|---------------|
+| M1. Foundation | Supabase project, schema, RLS, storage bucket, auth screens, tab layout, EAS dev build | Landlord can sign up and sign in on a dev build on Android |
 | M2. Properties and tenants | Onboarding (location, unit types, counts, rent), properties and units screens, add/edit tenant, documents upload and viewer, notes | A new landlord finishes onboarding with 9 units in under 2 minutes, then adds 10 tenants with Aadhaar photos and PDFs |
 | M3. Rent and advance | Charge generation job, payments with partial and from-advance, reschedule, Today screen | Ledger matches hand calculations for 20 test scenarios, including all §11 edge cases |
-| M4. Notifications | Push tokens, channel, `send-reminders`, receipts, inbox, tap routing | Reminders arrive for due, overdue, rescheduled and agreement cases over 7 real days |
-| M5. Agreement, notice, move-out, history, polish | Renewals, notice period and planned move-out, move-out reminders, settlement, payment history, settings, empty states, delete account | Usability test with one real landlord; no P0 bugs |
+| M4. Agreement, notice, move-out, history, polish (**MVP complete**) | Renewals, notice period and planned move-out, settlement, payment history, settings, empty states, delete account | Usability test with one real landlord; no P0 bugs |
+| M5. Push notifications | Firebase + `google-services.json`, new dev build, push tokens, channel, `send-reminders`, receipts, in-app reminders inbox, tap routing, move-out reminders | Reminders arrive for due, overdue, rescheduled, agreement and move-out cases over 7 real days |
 | M6. Release | Privacy policy, store listings, production EAS builds, `eas submit` | Live on Play Store (and App Store if decided) |
 
 ---

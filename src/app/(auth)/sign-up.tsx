@@ -1,12 +1,14 @@
-import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
 
-import { authStyles as styles } from '@/components/auth-styles';
-import { Button } from '@/components/button';
-import { TextField } from '@/components/text-field';
+import { AuthFooter } from '@/components/auth/auth-footer';
+import { AuthHeader } from '@/components/auth/auth-header';
+import { Button } from '@/components/ui/button';
+import { Screen } from '@/components/ui/screen';
+import { Text } from '@/components/ui/text';
+import { TextField } from '@/components/ui/text-field';
 import { supabase } from '@/lib/supabase';
+import { space } from '@/theme';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -15,86 +17,108 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function handleSignUp() {
+    setError(null);
     if (!email.trim() || !password) {
-      Alert.alert('Missing details', 'Enter your email and a password.');
+      setError('Enter your email and a password.');
       return;
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
-      Alert.alert('Password too short', `Use at least ${MIN_PASSWORD_LENGTH} characters.`);
+      setError(`Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Passwords don’t match', 'Re-enter the same password in both fields.');
+      setError('The two passwords don’t match. Enter the same password in both fields.');
       return;
     }
 
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+    });
     setLoading(false);
 
-    if (error) {
-      Alert.alert('Sign up failed', error.message);
+    if (signUpError) {
+      setError(signUpError.message);
       return;
     }
     // With "Confirm email" on in Supabase, no session is returned until the
     // user clicks the link in their inbox. Otherwise they are signed in now.
-    if (!data.session) {
-      Alert.alert('Check your email', 'We sent you a link to confirm your account. Then sign in.');
-    }
+    if (!data.session) setSentTo(email.trim());
+  }
+
+  if (sentTo) {
+    return (
+      <Screen scroll centered>
+        <AuthHeader
+          title="Confirm your email"
+          subtitle={`We sent a confirmation link to ${sentTo}. Open it, then come back and sign in.`}
+        />
+        <AuthFooter prompt="Confirmed already?" linkText="Sign in" href="/sign-in" />
+      </Screen>
+    );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>Create account</Text>
-          <Text style={styles.subtitle}>Start tracking your tenants and rent.</Text>
+    <Screen scroll centered>
+      <AuthHeader
+        title="Create your account"
+        subtitle="Set up your properties, then add tenants and track their rent."
+      />
 
-          <View style={styles.form}>
-            <TextField
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-            />
-            <TextField
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
-              secureTextEntry
-              autoComplete="new-password"
-              textContentType="newPassword"
-            />
-            <TextField
-              label="Confirm password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="Re-enter password"
-              secureTextEntry
-              autoComplete="new-password"
-              textContentType="newPassword"
-              onSubmitEditing={handleSignUp}
-            />
-            <Button title="Create account" onPress={handleSignUp} loading={loading} />
-          </View>
+      <View style={styles.form}>
+        <TextField
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          returnKeyType="next"
+        />
+        <TextField
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Choose a password"
+          hint={`At least ${MIN_PASSWORD_LENGTH} characters`}
+          secureTextEntry
+          autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="next"
+        />
+        <TextField
+          label="Confirm password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          placeholder="Enter it again"
+          secureTextEntry
+          autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="go"
+          onSubmitEditing={handleSignUp}
+        />
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account?</Text>
-            <Link href="/sign-in" replace style={styles.link}>
-              Sign in
-            </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {error ? (
+          <Text variant="caption" tone="khata" accessibilityLiveRegion="polite">
+            {error}
+          </Text>
+        ) : null}
+
+        <Button title="Create account" onPress={handleSignUp} loading={loading} />
+      </View>
+
+      <AuthFooter prompt="Already have an account?" linkText="Sign in" href="/sign-in" />
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  form: { gap: space.lg },
+});
