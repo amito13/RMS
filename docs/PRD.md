@@ -102,6 +102,10 @@ A typical landlord with 5 to 50 tenants across a few buildings:
 | **Advance** | Advance rent. Months of rent the tenant pays up front, which is later used up against rent charges. |
 | **Agreement** | The rental agreement, usually 11 months, with a start date and an end date. |
 | **Renewal date** | The agreement's end date, when it must be renewed or the tenant moves out. |
+| **Notice period** | Days of notice the tenant or landlord must give before the tenant leaves, e.g. 30 days. |
+| **Notice** | A record that the tenant is leaving: who gave it, when, and the planned move-out date. A tenancy with notice is "On notice". |
+| **Planned move-out date** | The date the tenant is expected to leave. The unit is "available from" the next day. |
+| **Payment history** | A tenant's month-by-month record of whether rent was paid on time, how late, and in how many parts. |
 | **Outstanding** | Rent owed and not yet paid, across all of a tenant's rent charges. |
 | **Overdue** | A rent charge whose due date has passed and still has an outstanding amount. |
 
@@ -118,6 +122,8 @@ Priorities used in this document: **P0** = must ship in MVP, **P1** = ships shor
 | Tenants | Full profile, members count, search, filters | Household member names | Tenant photo |
 | Documents | Aadhaar (image/PDF), other doc types, view, replace, delete | Image compression and crop | Expiry dates for documents |
 | Rent | Monthly charges, partial payments, outstanding, overdue | Edit/void payments with audit trail | Rent receipts (PDF share) |
+| Payment history | Per-tenant month-by-month history, on time vs late, delays, promises kept, totals, all-payments timeline | Payment habit label and filter, history on renew/notice sheets | Share history |
+| Notice & planned move-out | Notice period per tenancy, record/change/withdraw notice, "Leaving on" status, move-out reminders, units "available from" | Short-notice warning with rent for the notice period | |
 | Reschedule | Move due date with reason, history | Reschedule from notification | |
 | Advance | Agreed vs received vs pending, apply to rent | Apply on move-out automatically | |
 | Agreement | Start/end dates, renew, renewal reminders | Rent revision on renewal | Upload signed agreement scan |
@@ -225,6 +231,7 @@ A tenant record holds the person; a tenancy holds the stay. The add-tenant flow 
 | Advance received now | No | 0 | Recorded as an advance payment. Anything left is "advance pending". |
 | Agreement start date | Yes | Shift date | |
 | Agreement term | Yes | 11 months | |
+| Notice period | Yes | 30 days | Days of notice either side must give before move-out (see [§7.10](#710-notice-period-planned-move-out-and-move-out)). |
 | Agreement end (renewal) date | Yes | Start + term | Editable. |
 
 **First rent due date (existing tenants).** When the shift date is today or in the future, the first due date is the shift date. When the shift date is in the past (the landlord is entering a tenant who already lives there), the form asks "When is their next rent due?" and defaults to the next occurrence of the due day. RMS does not create charges for months before that date, so old, already-settled months never show as overdue.
@@ -234,7 +241,7 @@ A tenant record holds the person; a tenancy holds the stay. The add-tenant flow 
 | TEN-1 | P0 | Add tenant is a step-by-step form: (1) Person, (2) Unit and rent, (3) Advance and agreement, (4) Documents, (5) Review. Step 4 can be skipped. Progress is not lost when going back. |
 | TEN-2 | P0 | Saving creates the tenant, the tenancy, the first rent charge, and the advance payment (if any) in one transaction. If any part fails, nothing is saved. |
 | TEN-3 | P0 | The Tenants tab lists active tenants with name, property and unit, and a status chip: **Overdue ₹X**, **Due today ₹X**, **Partly paid ₹X left**, **Paid**, or **Due on <date>**. |
-| TEN-4 | P0 | The list can be searched by name, phone or unit, and filtered by property and by status (Overdue, Due this week, Advance pending, Verification missing, Moved out). Default sort: overdue first, then by next due date. |
+| TEN-4 | P0 | The list can be searched by name, phone or unit, and filtered by property and by status (Overdue, Due this week, Advance pending, Verification missing, Moving out soon, Moved out). Default sort: overdue first, then by next due date. |
 | TEN-5 | P0 | The tenant detail screen shows: header (name, unit, call and WhatsApp buttons), money summary (outstanding, next due date and amount, advance pending, advance balance), and sections for Payments, Documents, Agreement, Notes and Profile. |
 | TEN-6 | P0 | Every tenant and tenancy field can be edited after creation. Changing monthly rent or due day applies to rent charges created after the change; existing charges keep their amount unless the landlord edits them. |
 | TEN-7 | P1 | Household member names and ages can be added (optional), alongside the members count. |
@@ -285,6 +292,37 @@ A tenant record holds the person; a tenancy holds the stay. The add-tenant flow 
 | RENT-8 | P2 | Generate a rent receipt PDF for a payment and share it with the tenant. |
 
 **Example.** Ravi's rent is ₹8,000, due on the 2nd. On 2 Nov he pays ₹5,000 in cash. The November charge shows "Partly paid, ₹3,000 left". On 3 Nov it becomes "Overdue, ₹3,000". On 5 Nov he pays ₹3,000 by UPI and the charge becomes "Paid".
+
+#### Payment history
+
+Every tenant has a payment history that shows not just what they paid, but **how reliably** they pay. It answers the questions a landlord asks before renewing, raising rent, or chasing a payment: "Does this tenant usually pay on time? How late do they get? Do they keep their promises?"
+
+**How each month is judged.** A month is settled on the day its payments (including "From advance") first add up to the amount due. That day is compared with the **original** due date, so rescheduling doesn't hide lateness:
+
+| Result | Rule | Shown as |
+|--------|------|----------|
+| On time | Settled on or before the original due date | "On time" (green) |
+| Late, promise kept | Settled after the original date but on or before the rescheduled date | "6 days late, paid on promised date" |
+| Late | Settled after the original date (and after any rescheduled date) | "9 days late" |
+| Paid in parts | Settled with 2 or more payments | Extra label "in 3 parts", alongside the result above |
+| Waived | Remainder waived | "₹2,000 waived" |
+| Still unpaid | Not settled yet, due date passed | "Unpaid, 12 days" |
+| Not due yet | Due date is in the future | Not counted |
+
+| ID | Pri | Requirement |
+|----|-----|-------------|
+| HIST-1 | P0 | The tenant detail screen has a **Payment history** section. At the top, a summary for the last 12 months (or since move-in, if shorter): "On time 8 of 11 months. Late 3 times, 5 days on average, longest 14 days (March)." |
+| HIST-2 | P0 | Below the summary, a month-by-month strip of coloured dots (green on time, amber late, red unpaid, grey waived) for the last 12 months. Tapping a month opens its details. |
+| HIST-3 | P0 | A full month-by-month list, newest first: month, amount due, amount paid, result (table above), original and rescheduled due dates, and every payment in that month with date, amount, mode and reference. |
+| HIST-4 | P0 | **Promises kept:** count of rescheduled months paid by the promised date, e.g. "Kept 3 of 4 promised dates". Shown in the summary when the tenant has rescheduled at least once. |
+| HIST-5 | P0 | **Totals:** total rent paid since move-in, total paid this financial year (Apr–Mar), and total waived. |
+| HIST-6 | P0 | An **All payments** view lists every payment for the tenant (rent and advance) as one timeline, filterable by year and by mode (Cash, UPI, Bank, Cheque, From advance). |
+| HIST-7 | P1 | A **payment habit** label once the tenant has 3 or more settled months: **Usually on time** (80%+ on time in the last 6 months), **Sometimes late**, or **Often late** (50%+ late). Shown on the tenant card in the Tenants list and on the tenant detail header. Filter "Often late" in the Tenants list. |
+| HIST-8 | P1 | The payment summary (HIST-1 and HIST-4) is shown on the **Renew agreement** sheet and the **Record notice** sheet, where the landlord decides whether to renew or raise rent. |
+| HIST-9 | P1 | Overdue reminders for a tenant labelled "Often late" add a line: "Late 4 of the last 6 months." |
+| HIST-10 | P2 | Share a tenant's payment history as a text summary or PDF (for example, as a reference for the tenant's next landlord), after a confirmation that it contains personal data. |
+
+Months before the tenant's first rent due date in RMS are not counted (the landlord didn't track them here). A moved-out tenant's history stays visible, read-only.
 
 ### 7.6 Advance rent
 
@@ -344,11 +382,49 @@ This is the "not the 10th, give me till the 11th" case.
 | NOTE-4 | P0 | The latest note is shown on the tenant detail header, so the landlord sees the last promise before calling. |
 | NOTE-5 | P1 | A note can be pinned to stay at the top. |
 
-### 7.10 Move-out
+### 7.10 Notice period, planned move-out and move-out
+
+Tenants rarely just leave. They (or the landlord) give notice first: "We're leaving at the end of next month." RMS records that notice so the landlord knows who's leaving, when the unit becomes free, and what has to be settled before the tenant goes.
+
+**Notice period.** Each tenancy has an agreed notice period, set when the tenant is added (step 3, with the agreement) and editable later.
+
+| Field | Required | Default | Notes |
+|-------|----------|---------|-------|
+| Notice period | Yes | 30 days | 0 to 180 days. The landlord can set a property-wide default in Settings (P1). |
+
+**Notice.** Recorded on the tenancy with "Record notice" on the tenant detail screen.
+
+| Field | Required | Default | Notes |
+|-------|----------|---------|-------|
+| Given by | Yes | Tenant | **Tenant** (tenant is leaving) or **Landlord** (landlord asked them to leave) |
+| Notice date | Yes | Today | The day notice was given. Can be in the past, not in the future. |
+| Planned move-out date | Yes | Notice date + notice period | The date the tenant will leave. Must be on or after the notice date. |
+| Reason | No | | Free text, e.g. "Job transfer to Pune" |
+
+**Tenancy status.** A tenancy is **Active**, **On notice** (notice recorded, not yet moved out) or **Ended**.
 
 | ID | Pri | Requirement |
 |----|-----|-------------|
-| OUT-1 | P0 | "End tenancy" asks for the move-out date and shows a settlement summary: outstanding rent, advance balance, and the net amount (tenant owes or refund due). |
+| NOTICE-1 | P0 | Each tenancy has a notice period (default 30 days), entered in add-tenant step 3 and shown in the Agreement section: "Notice period: 30 days". |
+| NOTICE-2 | P0 | "Record notice" on an Active tenancy opens a sheet with the fields above. The planned move-out date is pre-filled as notice date + notice period, and the sheet shows the rent still to be collected until then (outstanding now + charges due before the planned move-out date). |
+| NOTICE-3 | P0 | **Short notice.** If the planned move-out date is earlier than notice date + notice period, the sheet warns: "Short notice: 12 days less than the agreed 30 days." The landlord can still save. The warning is kept on the notice and in the note. |
+| NOTICE-4 | P0 | Saving sets the tenancy to **On notice**, and adds a system note: "Notice given by tenant on 1 Nov. Leaving on 30 Nov. Reason: Job transfer to Pune." |
+| NOTICE-5 | P0 | An On-notice tenant shows a **"Leaving 30 Nov"** chip (with days left) on their card in the Tenants list, on the tenant detail header, and on the unit in the property screen. |
+| NOTICE-6 | P0 | The unit shows **"Available from 1 Dec"** (day after planned move-out) in the property screen and in a new **Moving out soon** filter on the Tenants list. |
+| NOTICE-7 | P0 | The planned move-out date can be changed (earlier or later). Each change is kept in history with old date, new date and reason, and adds a system note, like rescheduling. |
+| NOTICE-8 | P0 | **Withdraw notice** (the tenant decides to stay) returns the tenancy to Active, keeps the withdrawn notice in history, and adds a note. Rent charges and reminders carry on as before. |
+| NOTICE-9 | P0 | While On notice: rent charges are still created and rent reminders still sent, but **only for rent due on or before the planned move-out date**. No charge is created for a month whose due date is after it. |
+| NOTICE-10 | P0 | While On notice, agreement renewal reminders stop, because the tenant isn't renewing. |
+| NOTICE-11 | P0 | Move-out reminders are sent (see [§8.1](#81-when-reminders-are-sent)): 3 days before the planned move-out date, on the day, and every day after it until the landlord ends the tenancy, changes the date, or withdraws the notice. |
+| NOTICE-12 | P0 | On the planned move-out date, the tenant detail screen shows a prominent **End tenancy** button with the settlement summary (OUT-1), pre-filled with the planned date as the move-out date. |
+| NOTICE-13 | P1 | **Rent for short notice.** When notice is short, the landlord can choose "Charge rent for the full notice period", which adds a final charge for the missing days (monthly rent ÷ 30 × days short). It appears in the settlement. |
+| NOTICE-14 | P1 | Settings: default notice period for new tenants. |
+
+**Move-out**
+
+| ID | Pri | Requirement |
+|----|-----|-------------|
+| OUT-1 | P0 | "End tenancy" asks for the move-out date (pre-filled with the planned move-out date if notice was given) and shows a settlement summary: outstanding rent, advance balance, and the net amount (tenant owes or refund due). The landlord can also end a tenancy without notice (e.g. the tenant left suddenly). |
 | OUT-2 | P0 | The landlord can record a final payment, use the advance balance, and waive the rest, from the same screen. |
 | OUT-3 | P0 | After confirmation, the tenancy is ended, the unit becomes vacant, no new charges are created, and **all reminders for that tenancy stop**, even if a balance remains. |
 | OUT-4 | P0 | Moved-out tenants stay in the app under the "Moved out" filter, read-only, with all documents, payments and notes. |
@@ -361,7 +437,7 @@ The first tab. Answers "who do I collect from today?"
 
 | ID | Pri | Requirement |
 |----|-----|-------------|
-| DASH-1 | P0 | Sections, in order: **Overdue** (oldest first, with days overdue), **Due today**, **Due in the next 7 days**, **Agreements ending in the next 30 days**. Empty sections are hidden. |
+| DASH-1 | P0 | Sections, in order: **Overdue** (oldest first, with days overdue), **Due today**, **Due in the next 7 days**, **Moving out in the next 30 days** (with planned date, outstanding and "End tenancy" once the date arrives), **Agreements ending in the next 30 days**. Empty sections are hidden. |
 | DASH-2 | P0 | Each row: tenant name, property and unit, amount outstanding, due date, and quick actions **Record payment**, **Call**, **Reschedule**. |
 | DASH-3 | P0 | Totals at the top: **To collect today** (overdue + due today), **Collected this month**, **Advance pending**. |
 | DASH-4 | P0 | When nothing is due: an empty state that says when the next rent is due and from whom. |
@@ -375,7 +451,7 @@ The first tab. Answers "who do I collect from today?"
 |----|-----|-------------|
 | SET-1 | P0 | Profile: name, email (read-only), change password. |
 | SET-2 | P0 | Reminder time: the time of day reminders are sent. Default 9:00 AM. |
-| SET-3 | P0 | Reminder toggles: rent due today, overdue (daily), agreement renewal. All on by default. |
+| SET-3 | P0 | Reminder toggles: rent due today, overdue (daily), agreement renewal, move-out. All on by default. |
 | SET-4 | P0 | Notification permission status. If notifications are off at OS level, show a banner with a button that opens the system settings. |
 | SET-5 | P0 | Sign out. |
 | SET-6 | P1 | Delete account (AUTH-6). |
@@ -396,14 +472,17 @@ All reminders are sent once a day, at the landlord's reminder time (default 9:00
 | **Rent due today** | A rent charge's current due date is today and outstanding > 0 | Once | |
 | **Rent overdue** | A rent charge's current due date is before today and outstanding > 0 | **Every day** | Charge is paid or waived, its date is moved to the future, or the tenancy ends |
 | **Rescheduled rent due** | A rescheduled charge's new due date is today | Once, then overdue rules apply from the next day | |
-| **Agreement renewal due** | The agreement's renewal date (or its rescheduled date) is today and it hasn't been renewed | Every 7 days after the date | Agreement is renewed, its date is moved, or the tenancy ends |
+| **Agreement renewal due** | The agreement's renewal date (or its rescheduled date) is today and it hasn't been renewed | Every 7 days after the date | Agreement is renewed, its date is moved, notice is recorded, or the tenancy ends |
+| **Move-out coming up** | A tenant on notice has a planned move-out date 3 days from today | Once | |
+| **Move-out today** | A tenant's planned move-out date is today | Once | |
+| **Move-out pending** | The planned move-out date has passed and the tenancy hasn't been ended | **Every day** | Tenancy is ended, the date is moved to the future, or notice is withdrawn |
 
 Rules:
 
 - **Rescheduling replaces the date.** A charge moved from 10 Nov to 11 Nov gets no reminder on 10 Nov and a "due today" reminder on 11 Nov. If it's still unpaid, daily overdue reminders start on 12 Nov.
 - **Partial payment changes the amount.** The reminder always shows the current outstanding, not the original rent.
 - **One rent reminder per tenant per day.** If a tenant has an overdue month and a month due today, one reminder shows the total. The overdue wording wins.
-- **No duplicates.** A tenant gets at most one rent reminder and one agreement reminder per day, even if the job runs twice.
+- **No duplicates.** A tenant gets at most one rent reminder, one agreement reminder and one move-out reminder per day, even if the job runs twice.
 - **Every device.** Reminders go to every phone where the landlord is signed in.
 - **Too many at once.** If more than 5 tenants need a reminder on the same morning, the landlord gets the 5 most overdue as separate notifications plus one summary: "3 more tenants owe rent today: ₹21,000. Open RMS to see the list." (P1. In P0, one notification per tenant.)
 
@@ -419,6 +498,9 @@ Each notification names the tenant, the amount to collect, and when they last pa
 | Overdue | Ravi Kumar's rent is 3 days overdue | ₹8,000 for November was due on 2 Nov. Last paid ₹8,000 on 2 Oct. |
 | Overdue, several months | Ravi Kumar owes ₹16,000 | October and November rent are unpaid. Oldest was due on 2 Oct. |
 | Agreement renewal | Ravi Kumar's agreement ends today | The 11-month agreement for Flat 2B started on 2 Dec 2025. Renew it or end the tenancy. |
+| Move-out in 3 days | Ravi Kumar leaves Flat 2B on 30 Nov | Settle before he goes: ₹3,000 rent outstanding, ₹8,000 advance balance. |
+| Move-out today | Ravi Kumar is moving out today | Flat 2B, Shanti Niwas. Check the flat and end the tenancy to settle ₹3,000 outstanding. |
+| Move-out pending | Ravi Kumar was due to leave 2 days ago | Planned move-out was 30 Nov. End the tenancy, or change the date if he's staying longer. |
 
 Formatting rules:
 
@@ -433,6 +515,7 @@ Formatting rules:
 |----|-----|-------------|
 | NOTIF-1 | P0 | Tapping a rent reminder opens that tenant's detail screen with the Record payment sheet open and prefilled. |
 | NOTIF-2 | P0 | Tapping an agreement reminder opens the tenant's Agreement section. |
+| NOTIF-2a | P0 | Tapping a move-out reminder opens the tenant's detail screen with the End tenancy settlement summary (OUT-1) ready. |
 | NOTIF-3 | P0 | Tapping the summary notification opens the Today screen. |
 | NOTIF-4 | P0 | If the app is signed out when a notification is tapped, it opens sign-in and then continues to the target screen. |
 | NOTIF-5 | P0 | If the tenant was moved out or deleted since the notification was sent, open the Today screen with a message "This tenant is no longer active." |
@@ -544,10 +627,20 @@ aadhaar_last4 char(4), household_members jsonb  -- P1
 **tenancies**
 ```
 id, landlord_id, tenant_id → tenants, unit_id → units,
-shift_date date, move_out_date date, status ('active'|'ended'),
+shift_date date, move_out_date date, status ('active'|'on_notice'|'ended'),
 monthly_rent int, rent_due_day smallint check (1..31), first_due_date date,
-advance_agreed int default 0
-unique (unit_id) where status = 'active'
+advance_agreed int default 0, notice_period_days smallint default 30 check (0..180)
+unique (unit_id) where status in ('active', 'on_notice')
+```
+
+**move_out_notices** (one row per notice; at most one open notice per tenancy)
+```
+id, landlord_id, tenancy_id → tenancies, given_by ('tenant'|'landlord'),
+notice_date date, planned_move_out_date date, reason text,
+is_short_notice bool, short_by_days smallint,
+status ('open'|'withdrawn'|'completed'), withdrawn_at timestamptz, completed_at timestamptz
+unique (tenancy_id) where status = 'open'
+check (planned_move_out_date >= notice_date)
 ```
 
 **agreements** (one row per agreement period; the latest is current)
@@ -579,11 +672,11 @@ mode ('cash'|'upi'|'bank'|'cheque'|'from_advance'|'other'),
 reference, note, voided_at, void_reason
 ```
 
-**date_changes** (reschedule history for rent charges and agreements)
+**date_changes** (reschedule history for rent charges, agreements and planned move-out dates)
 ```
-id, landlord_id, rent_charge_id null, agreement_id null,
+id, landlord_id, rent_charge_id null, agreement_id null, notice_id null,
 old_date, new_date, reason
-check (exactly one of rent_charge_id, agreement_id is set)
+check (exactly one of rent_charge_id, agreement_id, notice_id is set)
 ```
 
 **documents**
@@ -600,9 +693,10 @@ is_system bool
 
 **notifications** (sent reminders, also the in-app inbox)
 ```
-id, landlord_id, category ('rent'|'agreement'|'summary'),
-type ('rent_due'|'rent_overdue'|'rent_rescheduled_due'|'agreement_due'|'summary'),
-tenancy_id null, rent_charge_ids uuid[], agreement_id null,
+id, landlord_id, category ('rent'|'agreement'|'move_out'|'summary'),
+type ('rent_due'|'rent_overdue'|'rent_rescheduled_due'|'agreement_due'|
+      'move_out_upcoming'|'move_out_today'|'move_out_pending'|'summary'),
+tenancy_id null, rent_charge_ids uuid[], agreement_id null, notice_id null,
 for_date date, title, body, data jsonb,
 status ('queued'|'sent'|'failed'), expo_ticket_ids text[], error, read_at
 unique (landlord_id, tenancy_id, category, for_date)  -- one per tenant per category per day
@@ -611,20 +705,22 @@ unique (landlord_id, tenancy_id, category, for_date)  -- one per tenant per cate
 **Derived values** (Postgres views, so app and server use the same rules):
 
 - `rent_charge_balances`: per charge, `paid` (sum of non-voided payments), `outstanding = amount_due − paid − waived_amount`, and `status` from the table in [§7.5](#75-rent-and-payments), using the landlord's timezone for "today".
-- `tenancy_summaries`: per tenancy, total outstanding, next due date and amount, last payment date and amount, advance received, advance pending, advance balance, days overdue.
+- `tenancy_summaries`: per tenancy, total outstanding, next due date and amount, last payment date and amount, advance received, advance pending, advance balance, days overdue, notice status and planned move-out date.
+- `rent_charge_history`: per charge, `settled_on` (the date cumulative non-voided payments first reached `amount_due − waived_amount`), `days_late` (`settled_on − original_due_date`, or today − original date if unsettled), `payment_count`, `was_rescheduled`, `promise_kept`, and `result` (on_time, late_promise_kept, late, waived, unpaid, not_due) per [Payment history](#payment-history).
+- `tenancy_payment_stats`: per tenancy, over the last 12 months and since move-in: months on time, months late, average and longest delay, promises kept vs made, total paid, total paid this financial year, total waived, and the payment habit label (HIST-7).
 
 **Row Level Security.** Enabled on every table. Policy on all tables: a row is visible and writable only when `landlord_id = auth.uid()` (`id = auth.uid()` on `profiles`). Edge Functions use the service role and must filter by `landlord_id` themselves.
 
 **Storage.** Bucket `tenant-documents`, private. Object path: `{landlord_id}/{tenant_id}/{document_id}.{ext}`. Storage policies allow read, insert, update and delete only when the first path segment equals `auth.uid()`. Bucket file size limit 10 MB; allowed MIME types `image/jpeg`, `image/png`, `application/pdf`.
 
-**Transactions.** Creating a tenant (TEN-2), recording a payment split across months (RENT-2), ending a tenancy (OUT-3) and renewing an agreement run as Postgres functions called with `supabase.rpc`, so each is all-or-nothing.
+**Transactions.** Creating a tenant (TEN-2), recording a payment split across months (RENT-2), ending a tenancy (OUT-3), recording or withdrawing notice (NOTICE-2, NOTICE-8) and renewing an agreement run as Postgres functions called with `supabase.rpc`, so each is all-or-nothing.
 
 ### 9.4 Scheduled jobs
 
 | Job | Schedule | What it does |
 |-----|----------|--------------|
-| `generate_rent_charges()` | Daily, 00:05 IST (pg_cron, SQL) | For each active tenancy, creates any missing charges from `first_due_date` up to today + 31 days, never past `move_out_date`. Due date = `rent_due_day` in that month, or the month's last day if shorter. Amount = current monthly rent. Idempotent through `unique (tenancy_id, period_month)`. Also called right after a tenant is created. |
-| `send-reminders` | Every 15 minutes (pg_cron → pg_net → Edge Function) | Picks landlords whose local time has passed `reminder_time` and whose `last_reminder_run_on` is before their local today. For each: selects due-today, overdue, rescheduled-due and agreement-due items per [§8.1](#81-when-reminders-are-sent); inserts `notifications` rows (unique keys prevent duplicates); sends them to all of the landlord's tokens via the Expo Push API in batches of up to 100; stores ticket IDs; sets `last_reminder_run_on`. Retries 429 and 5xx with exponential backoff. |
+| `generate_rent_charges()` | Daily, 00:05 IST (pg_cron, SQL) | For each Active or On-notice tenancy, creates any missing charges from `first_due_date` up to today + 31 days, never with a due date after the open notice's `planned_move_out_date` or the `move_out_date`. Due date = `rent_due_day` in that month, or the month's last day if shorter. Amount = current monthly rent. Idempotent through `unique (tenancy_id, period_month)`. Also called right after a tenant is created. |
+| `send-reminders` | Every 15 minutes (pg_cron → pg_net → Edge Function) | Picks landlords whose local time has passed `reminder_time` and whose `last_reminder_run_on` is before their local today. For each: selects due-today, overdue, rescheduled-due, agreement-due and move-out items per [§8.1](#81-when-reminders-are-sent); inserts `notifications` rows (unique keys prevent duplicates); sends them to all of the landlord's tokens via the Expo Push API in batches of up to 100; stores ticket IDs; sets `last_reminder_run_on`. Retries 429 and 5xx with exponential backoff. |
 | `check-push-receipts` | Every 30 minutes | Fetches receipts for tickets older than 15 minutes (up to 1,000 IDs per request; Expo clears receipts after 24 hours). Marks failures, and deletes tokens that return `DeviceNotRegistered`. |
 | Inbox cleanup | Daily | Deletes `notifications` rows older than 90 days. |
 
@@ -658,7 +754,8 @@ src/app/
       new.tsx                 add-tenant steps
       [id]/index.tsx          tenant detail
       [id]/edit.tsx
-      [id]/move-out.tsx
+      [id]/payments.tsx       payment history: summary, month list, all payments
+      [id]/move-out.tsx       end tenancy and settlement
       [id]/documents/[docId].tsx   full-screen viewer
     properties/
       new.tsx                 same location + units steps as onboarding (shared components)
@@ -670,7 +767,7 @@ src/app/
 
 The root layout decides where a signed-in landlord goes: if `profiles.onboarding_completed_at` is null, to `onboarding/`; otherwise to `(app)/`. A notification tap during onboarding waits until onboarding is finished.
 
-Record payment, Reschedule, Use advance, Renew agreement and Add note are bottom sheets over the tenant detail or Today screen, not separate routes. Non-route code (Supabase client, hooks, components, formatting) lives outside `src/app/`.
+Record payment, Reschedule, Use advance, Renew agreement, Record notice, Change move-out date, Withdraw notice and Add note are bottom sheets over the tenant detail or Today screen, not separate routes. Non-route code (Supabase client, hooks, components, formatting) lives outside `src/app/`.
 
 ### 9.6 New native packages
 
@@ -700,7 +797,7 @@ Also needed: an EAS project ID in `app.json` (`extra.eas.projectId`), FCM creden
 
 1. **Person**: name, phone, members.
 2. **Unit and rent**: property, vacant unit (shown with type and asking rent), shift date, monthly rent (pre-filled from the unit), due day. For a past shift date, "When is their next rent due?".
-3. **Advance and agreement**: advance agreed, advance received now (mode), agreement start, term (11 months), end date shown.
+3. **Advance and agreement**: advance agreed, advance received now (mode), agreement start, term (11 months), end date shown, notice period (30 days).
 4. **Documents**: Aadhaar front and back (camera), or Aadhaar PDF (files). "Skip for now" available.
 5. **Review** and save. The first rent charge is created.
 6. If this is the first tenant, ask for notification permission (NOTIF-10).
@@ -724,9 +821,18 @@ Also needed: an EAS project ID in `app.json` (`extra.eas.projectId`), FCM creden
 2. Landlord opens the Agreement section, taps Renew, keeps 11 months, optionally sets new rent from next month.
 3. Renewal reminders stop. The next renewal date is 11 months later.
 
-### 10.6 Move-out
+### 10.6 Tenant gives notice
 
-1. Tenant detail → End tenancy → move-out date.
+1. 1 Nov: Ravi tells the landlord he's leaving because of a job transfer.
+2. Landlord opens Ravi → Record notice. Given by: Tenant. Notice date: today. Planned move-out: 30 Nov (pre-filled from the 30-day notice period). Reason: "Job transfer to Pune".
+3. The sheet shows Ravi's payment summary ("On time 8 of 11 months") and what's left to collect before 30 Nov.
+4. Save. Ravi shows "Leaving 30 Nov" and Flat 2B shows "Available from 1 Dec". No December rent charge will be created. Agreement renewal reminders stop.
+5. 27 Nov: "Ravi Kumar leaves Flat 2B on 30 Nov. Settle before he goes…"
+6. If Ravi changes his mind, the landlord taps Withdraw notice and everything carries on as before.
+
+### 10.7 Move-out
+
+1. 30 Nov: "Ravi Kumar is moving out today." Tap → End tenancy, with 30 Nov pre-filled.
 2. Settlement: outstanding ₹3,000, advance balance ₹8,000 → "Use ₹3,000 from advance. Refund due to tenant: ₹5,000."
 3. Confirm. Unit is vacant, reminders stop, tenant moves to "Moved out".
 
@@ -753,6 +859,14 @@ Also needed: an EAS project ID in `app.json` (`extra.eas.projectId`), FCM creden
 | Reminder job fails or runs late | Next 15-minute run picks it up because `last_reminder_run_on` was not updated. Unique keys stop duplicate sends. |
 | Tenant pays after the morning reminder | No further reminder that day. The next day's run sees the charge as paid and sends nothing. |
 | Tenant moved out with dues | No more reminders (OUT-3). Shown under "Dues after move-out" (P1). |
+| Notice given, planned move-out a few days after a rent due date | That month's charge is still created and reminded in full. Pro-rating the last month is done by editing the charge at settlement (RENT-6). |
+| Planned move-out date passes but the tenant is still there | Daily "Move-out pending" reminders until the landlord ends the tenancy or moves the date. No new rent charges are created; if the stay is long, the landlord moves the date and charges resume. |
+| Tenant on notice gives a new, later date | Change move-out date (NOTICE-7). Charges up to the new date are created by the next daily job. |
+| Notice recorded, then withdrawn | Tenancy back to Active. Charges that were skipped are created by the next daily job. Withdrawn notice stays in history. |
+| Landlord records notice with notice date in the past | Allowed. Short-notice check uses that past date. |
+| Payment for a rescheduled month made after the new date too | Counted as "Late", and the promise counted as not kept. |
+| A month paid partly from advance | Settled date is when the "From advance" payment completed it; counted like any payment. |
+| Tenant has fewer than 3 settled months | Payment history shows the months, but no habit label (HIST-7). |
 | Document upload fails on bad network | Tenant is saved; document shows "Upload failed, tap to retry" (DOC-7). |
 | Two tenants added to the same unit at the same time | Database unique constraint rejects the second; app shows "This unit already has a tenant." |
 | No internet | App shows the last loaded data read-only with an "Offline" banner. Saving is disabled until online. |
@@ -814,7 +928,7 @@ Also needed: an EAS project ID in `app.json` (`extra.eas.projectId`), FCM creden
 | M2. Properties and tenants | Onboarding (location, unit types, counts, rent), properties and units screens, add/edit tenant, documents upload and viewer, notes | A new landlord finishes onboarding with 9 units in under 2 minutes, then adds 10 tenants with Aadhaar photos and PDFs |
 | M3. Rent and advance | Charge generation job, payments with partial and from-advance, reschedule, Today screen | Ledger matches hand calculations for 20 test scenarios, including all §11 edge cases |
 | M4. Notifications | Push tokens, channel, `send-reminders`, receipts, inbox, tap routing | Reminders arrive for due, overdue, rescheduled and agreement cases over 7 real days |
-| M5. Agreement, move-out, polish | Renewals, move-out settlement, settings, empty states, delete account | Usability test with one real landlord; no P0 bugs |
+| M5. Agreement, notice, move-out, history, polish | Renewals, notice period and planned move-out, move-out reminders, settlement, payment history, settings, empty states, delete account | Usability test with one real landlord; no P0 bugs |
 | M6. Release | Privacy policy, store listings, production EAS builds, `eas submit` | Live on Play Store (and App Store if decided) |
 
 ---
@@ -847,3 +961,6 @@ These need an answer from the product owner. The PRD's current assumption is in 
 9. **Data export.** Does the landlord need an Excel/CSV export for their CA or records? [P2.]
 10. **More unit details.** Should a unit also record furnishing (furnished / semi / unfurnished), area in sq ft, or attached bathroom? [Not in v1; type, floor and rent only.]
 11. **Unit types.** Is the list Single room, 1RK, 1BHK, 2BHK, 3BHK, 4BHK+, Shop, Other complete for your properties? [Yes.]
+12. **Default notice period.** Is 30 days right for most of your tenants? [Yes, editable per tenant.]
+13. **Short notice.** When a tenant leaves early, do you charge rent for the missing notice days? [Optional per move-out, P1.]
+14. **"On time" with a grace period.** Should paying within a few days of the due date (e.g. by the 5th) still count as on time in payment history? [No grace period in v1; on time means by the due date.]

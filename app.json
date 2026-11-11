@@ -35,7 +35,32 @@
           "imageWidth": 76
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-localization",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#208AEF",
+          "defaultChannel": "rent-reminders"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "RMS needs access to your photos to attach tenant ID documents such as Aadhaar.",
+          "cameraPermission": "RMS uses the camera to photograph tenant ID documents such as Aadhaar.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "RMS uses Face ID to lock the app, because it stores tenant documents."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -51,6 +76,12 @@
         "projectId": "2bb3a84d-b078-4c2f-80d9-f13792b9dbb8"
       }
     },
-    "owner": "amit1312"
+    "owner": "amit1312",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2bb3a84d-b078-4c2f-80d9-f13792b9dbb8"
+    }
   }
 }

@@ -43,3 +43,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Firebase service account key (upload with `eas credentials`, never commit)
+*-firebase-adminsdk-*.json
