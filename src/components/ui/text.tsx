@@ -4,7 +4,7 @@ import { typography, useTheme, type Palette, type TypographyVariant } from '@/th
 
 type Tone = keyof Pick<
   Palette,
-  'ink' | 'inkMuted' | 'inkFaint' | 'khata' | 'violet' | 'haldi' | 'blue'
+  'ink' | 'inkMuted' | 'inkFaint' | 'brand' | 'paid' | 'due' | 'overdue'
 >;
 
 type Props = TextProps & {

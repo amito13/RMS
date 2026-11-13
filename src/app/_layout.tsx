@@ -22,7 +22,7 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, isLoading } = useAuth();
   const [fontsLoaded, fontError] = useAppFonts();
-  const { scheme, colors } = useTheme();
+  const { colors } = useTheme();
 
   // If fonts fail to load, carry on with system fonts rather than block the app.
   const ready = !isLoading && (fontsLoaded || !!fontError);
@@ -36,7 +36,8 @@ function RootNavigator() {
 
   return (
     <>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      {/* Every screen opens with the emerald header band, so status bar text is always light. */}
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,

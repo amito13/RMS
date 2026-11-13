@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AuthFooter } from '@/components/auth/auth-footer';
-import { AuthHeader } from '@/components/auth/auth-header';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
@@ -53,23 +52,28 @@ export default function SignUp() {
 
   if (sentTo) {
     return (
-      <Screen scroll centered>
-        <AuthHeader
-          title="Confirm your email"
-          subtitle={`We sent a confirmation link to ${sentTo}. Open it, then come back and sign in.`}
-        />
+      <Screen
+        scroll
+        header={{
+          overline: 'RMS',
+          wordmark: true,
+          title: 'Confirm your email',
+          subtitle: `We sent a confirmation link to ${sentTo}. Open it, then come back and sign in.`,
+        }}>
         <AuthFooter prompt="Confirmed already?" linkText="Sign in" href="/sign-in" />
       </Screen>
     );
   }
 
   return (
-    <Screen scroll centered>
-      <AuthHeader
-        title="Create your account"
-        subtitle="Set up your properties, then add tenants and track their rent."
-      />
-
+    <Screen
+      scroll
+      header={{
+        overline: 'RMS',
+        wordmark: true,
+        title: 'Create your account',
+        subtitle: 'Set up your properties, then add tenants and track their rent.',
+      }}>
       <View style={styles.form}>
         <TextField
           label="Email"
@@ -106,7 +110,7 @@ export default function SignUp() {
         />
 
         {error ? (
-          <Text variant="caption" tone="khata" accessibilityLiveRegion="polite">
+          <Text variant="caption" tone="overdue" accessibilityLiveRegion="polite">
             {error}
           </Text>
         ) : null}

@@ -1,38 +1,46 @@
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { space, useTheme } from '@/theme';
 
+import { HeaderBand, type HeaderBandProps } from './header-band';
+
 type Props = {
-  children: ReactNode;
-  /** Scrollable content with keyboard handling, for forms and long screens. */
+  children?: ReactNode;
+  /** Emerald header band at the top. It handles the top safe-area inset. */
+  header: HeaderBandProps;
+  /** Scrollable body with keyboard handling, for forms and long screens. */
   scroll?: boolean;
-  /** Centre the content vertically (auth screens). */
+  /** Centre the body vertically (loading states). */
   centered?: boolean;
-  /** Tab screens sit above the tab bar, so they don't need the bottom inset. */
-  edges?: Edge[];
+  /** Tab screens sit above the tab bar, so they skip the bottom inset. */
+  bottomInset?: boolean;
 };
 
-/** Register-paper background with safe-area padding and the standard side gutter. */
-export function Screen({ children, scroll, centered, edges = ['top', 'bottom'] }: Props) {
+/** Header band, then the body on warm white with the standard side gutter. */
+export function Screen({ children, header, scroll, centered, bottomInset = true }: Props) {
   const { colors } = useTheme();
-  const content = [styles.content, centered && styles.centered];
+  const body = [styles.body, centered && styles.centered];
 
   return (
-    <SafeAreaView edges={edges} style={[styles.flex, { backgroundColor: colors.paper }]}>
+    <SafeAreaView
+      edges={bottomInset ? ['bottom'] : []}
+      style={[styles.flex, { backgroundColor: colors.paper }]}>
       {scroll ? (
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={[content, styles.grow]}
-            keyboardShouldPersistTaps="handled">
-            {children}
+          <ScrollView contentContainerStyle={styles.grow} keyboardShouldPersistTaps="handled">
+            <HeaderBand {...header} />
+            <View style={[body, styles.grow]}>{children}</View>
           </ScrollView>
         </KeyboardAvoidingView>
       ) : (
-        <View style={[styles.flex, content]}>{children}</View>
+        <>
+          <HeaderBand {...header} />
+          <View style={[styles.flex, body]}>{children}</View>
+        </>
       )}
     </SafeAreaView>
   );
@@ -41,6 +49,6 @@ export function Screen({ children, scroll, centered, edges = ['top', 'bottom'] }
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   grow: { flexGrow: 1 },
-  content: { paddingHorizontal: space.lg, paddingVertical: space.xl },
+  body: { paddingHorizontal: space.lg, paddingVertical: space.xl },
   centered: { justifyContent: 'center' },
 });

@@ -3,7 +3,6 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { AuthHeader } from '@/components/auth/auth-header';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
@@ -78,28 +77,36 @@ export default function ResetPassword() {
 
   if (linkState.status === 'checking') {
     return (
-      <Screen centered>
-        <ActivityIndicator color={colors.ink} accessibilityLabel="Checking your reset link" />
+      <Screen centered header={{ overline: 'RMS', wordmark: true, title: 'Checking your link' }}>
+        <ActivityIndicator color={colors.brand} accessibilityLabel="Checking your reset link" />
       </Screen>
     );
   }
 
   if (linkState.status === 'invalid') {
     return (
-      <Screen scroll centered>
-        <AuthHeader
-          title="This link didn't work"
-          subtitle={`${linkState.message} Ask for a new reset link and open the latest email.`}
-        />
+      <Screen
+        scroll
+        header={{
+          overline: 'RMS',
+          wordmark: true,
+          title: "This link didn't work",
+          subtitle: `${linkState.message} Ask for a new reset link and open the latest email.`,
+        }}>
         <Button title="Send a new link" onPress={() => router.replace('/forgot-password')} />
       </Screen>
     );
   }
 
   return (
-    <Screen scroll centered>
-      <AuthHeader title="Choose a new password" subtitle="You'll use it the next time you sign in." />
-
+    <Screen
+      scroll
+      header={{
+        overline: 'RMS',
+        wordmark: true,
+        title: 'Choose a new password',
+        subtitle: "You'll use it the next time you sign in.",
+      }}>
       <View style={styles.form}>
         <TextField
           label="New password"
@@ -125,7 +132,7 @@ export default function ResetPassword() {
         />
 
         {error ? (
-          <Text variant="caption" tone="khata" accessibilityLiveRegion="polite">
+          <Text variant="caption" tone="overdue" accessibilityLiveRegion="polite">
             {error}
           </Text>
         ) : null}

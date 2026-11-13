@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AuthFooter } from '@/components/auth/auth-footer';
-import { AuthHeader } from '@/components/auth/auth-header';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
@@ -35,9 +34,14 @@ export default function SignIn() {
   }
 
   return (
-    <Screen scroll centered>
-      <AuthHeader title="Sign in" subtitle="Keep track of your tenants, rent and documents." />
-
+    <Screen
+      scroll
+      header={{
+        overline: 'RMS',
+        wordmark: true,
+        title: 'Sign in',
+        subtitle: 'Keep track of your tenants, rent and documents.',
+      }}>
       <View style={styles.form}>
         <TextField
           label="Email"
@@ -70,7 +74,7 @@ export default function SignIn() {
         </View>
 
         {error ? (
-          <Text variant="caption" tone="khata" accessibilityLiveRegion="polite">
+          <Text variant="caption" tone="overdue" accessibilityLiveRegion="polite">
             {error}
           </Text>
         ) : null}

@@ -1,64 +1,91 @@
 /**
- * RMS design tokens: "the rent register".
+ * RMS design tokens: emerald and gold.
  *
- * The look borrows from the Indian bahi-khata (red cloth-bound ledger) and the
- * violet rubber stamp used to mark payments received. See docs/design.md.
+ * Emerald is the colour of money and trust; gold marks what's due. Each screen
+ * opens with an emerald header band, the body sits on warm white, and rent
+ * status is shown as a rubber-stamp impression. See docs/design.md.
  */
 
 export type ColorScheme = 'light' | 'dark';
 
 export type Palette = {
-  /** Screen background: register paper. */
+  /** Screen body background. */
   paper: string;
-  /** Raised surfaces: inputs, bottom sheets. */
+  /** Raised surfaces: inputs, bottom sheets, tab bar. */
   surface: string;
-  /** Main text: fountain-pen blue-black. */
+  /** Main text. */
   ink: string;
   /** Secondary text. */
   inkMuted: string;
   /** Placeholders and disabled text. */
   inkFaint: string;
-  /** Hairline rules between ledger rows and around inputs. */
+  /** Hairline rules between rows and around inputs. */
   rule: string;
-  /** Brand, primary actions, overdue. */
-  khata: string;
-  /** Text on top of khata red. */
-  onKhata: string;
+
+  /** Brand: primary buttons, links, active tab, focus ring. */
+  brand: string;
+  /** Text and icons on top of a brand-filled button. */
+  onBrand: string;
+
+  /** Header band at the top of every screen. */
+  header: string;
+  /** Title text on the header band. */
+  onHeader: string;
+  /** Secondary text on the header band. */
+  onHeaderMuted: string;
+  /** Gold accent on the header band (wordmark). */
+  gold: string;
+
   /** Paid / received stamp ink. */
-  violet: string;
+  paid: string;
   /** Due today / partly paid stamp ink. */
-  haldi: string;
-  /** Links, focus rings, ruled ledger lines. */
-  blue: string;
+  due: string;
+  /** Overdue stamp ink, and error messages. */
+  overdue: string;
 };
 
 export const palettes: Record<ColorScheme, Palette> = {
   light: {
-    paper: '#F5F6F2',
-    surface: '#FCFDFA',
-    ink: '#1B2430',
-    inkMuted: '#566170',
-    inkFaint: '#8A929D',
-    rule: '#D9DDD6',
-    khata: '#9B1C31',
-    onKhata: '#FFFFFF',
-    violet: '#5B3E96',
-    // Darker than the swatch #B7791F so stamp text stays readable on paper.
-    haldi: '#8F5E12',
-    blue: '#2F5D8A',
+    paper: '#FAFAF7',
+    surface: '#FFFFFF',
+    ink: '#14201B',
+    inkMuted: '#55625B',
+    inkFaint: '#8B958F',
+    rule: '#E2E5DE',
+
+    brand: '#065F46',
+    onBrand: '#FFFFFF',
+
+    header: '#065F46',
+    onHeader: '#FFFFFF',
+    onHeaderMuted: '#A9D8C6',
+    gold: '#E9C46A',
+
+    // Text-safe shades of the chosen swatches (#059669, #B7791F) so stamp
+    // labels stay readable on warm white (contrast ≥ 4.5:1).
+    paid: '#047857',
+    due: '#8F5E12',
+    overdue: '#B91C1C',
   },
   dark: {
-    paper: '#121A24',
-    surface: '#1A2430',
-    ink: '#E9ECE6',
-    inkMuted: '#A3ACB8',
-    inkFaint: '#6F7A88',
-    rule: '#2A3542',
-    khata: '#E0566B',
-    onKhata: '#1A0A0E',
-    violet: '#A98BE0',
-    haldi: '#E3A94A',
-    blue: '#7FA8D6',
+    paper: '#0E1613',
+    surface: '#16211C',
+    ink: '#E6EEE9',
+    inkMuted: '#9DB0A6',
+    inkFaint: '#66776E',
+    rule: '#24322B',
+
+    brand: '#34C79A',
+    onBrand: '#052B1F',
+
+    header: '#0A3D30',
+    onHeader: '#F2F7F4',
+    onHeaderMuted: '#8FC9B3',
+    gold: '#E9C46A',
+
+    paid: '#34D399',
+    due: '#E7B54F',
+    overdue: '#F87171',
   },
 };
 

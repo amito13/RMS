@@ -7,7 +7,7 @@ import { Text } from './text';
 
 type Props = TextInputProps & {
   label: string;
-  /** Shown under the field in khata red. */
+  /** Shown under the field in red. */
   error?: string;
   /** Shown under the field when there's no error. */
   hint?: string;
@@ -17,14 +17,14 @@ export function TextField({ label, error, hint, style, onFocus, onBlur, ...props
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
 
-  const borderColor = error ? colors.khata : focused ? colors.blue : colors.rule;
+  const borderColor = error ? colors.overdue : focused ? colors.brand : colors.rule;
 
   return (
     <View style={styles.field}>
       <Text variant="label">{label}</Text>
       <TextInput
         placeholderTextColor={colors.inkFaint}
-        selectionColor={colors.blue}
+        selectionColor={colors.brand}
         accessibilityLabel={label}
         accessibilityHint={error ?? hint}
         onFocus={(e) => {
@@ -51,7 +51,7 @@ export function TextField({ label, error, hint, style, onFocus, onBlur, ...props
         {...props}
       />
       {error ? (
-        <Text variant="caption" tone="khata">
+        <Text variant="caption" tone="overdue">
           {error}
         </Text>
       ) : hint ? (

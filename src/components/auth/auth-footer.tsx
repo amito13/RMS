@@ -12,7 +12,7 @@ export function AuthFooter({ prompt, linkText, href }: Props) {
   return (
     <View style={styles.footer}>
       <Text tone="inkMuted">{prompt}</Text>
-      <Link href={href} replace style={[typography.bodyStrong, { color: colors.blue }]}>
+      <Link href={href} replace style={[typography.bodyStrong, { color: colors.brand }]}>
         {linkText}
       </Link>
     </View>

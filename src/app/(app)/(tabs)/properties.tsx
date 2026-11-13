@@ -6,11 +6,8 @@ import { space } from '@/theme';
 
 export default function Properties() {
   return (
-    <Screen edges={['top']}>
-      <Text variant="title">Properties</Text>
-      <Text variant="heading" style={styles.emptyTitle}>
-        No properties yet
-      </Text>
+    <Screen bottomInset={false} header={{ title: 'Properties' }}>
+      <Text variant="heading">No properties yet</Text>
       <Text tone="inkMuted" style={styles.emptyBody}>
         Your buildings, their rooms and the rent for each will be listed here.
       </Text>
@@ -19,6 +16,5 @@ export default function Properties() {
 }
 
 const styles = StyleSheet.create({
-  emptyTitle: { marginTop: space.xxl },
   emptyBody: { marginTop: space.xs, maxWidth: 520 },
 });

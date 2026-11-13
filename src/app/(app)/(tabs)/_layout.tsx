@@ -20,9 +20,9 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.khata,
+        tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.inkMuted,
-        tabBarStyle: { backgroundColor: colors.paper, borderTopColor: colors.rule },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.rule },
         tabBarLabelStyle: { fontFamily: fonts.bodySemi, fontSize: 12 },
         sceneStyle: { backgroundColor: colors.paper },
       }}>

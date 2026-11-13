@@ -19,7 +19,7 @@ type Props = {
  */
 export function Stamp({ label, tone, tilted }: Props) {
   const { colors } = useTheme();
-  const ink = { paid: colors.violet, due: colors.haldi, late: colors.khata, neutral: colors.inkMuted }[
+  const ink = { paid: colors.paid, due: colors.due, late: colors.overdue, neutral: colors.inkMuted }[
     tone
   ];
 

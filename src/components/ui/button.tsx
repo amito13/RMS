@@ -17,11 +17,11 @@ export function Button({ title, onPress, variant = 'primary', loading, disabled 
   const inactive = disabled || loading;
 
   const container = {
-    primary: { backgroundColor: colors.khata },
-    secondary: { borderWidth: 1, borderColor: colors.ink },
+    primary: { backgroundColor: colors.brand },
+    secondary: { borderWidth: 1.5, borderColor: colors.brand },
     link: { minHeight: undefined, paddingVertical: space.sm, paddingHorizontal: 0 },
   }[variant];
-  const textColor = { primary: colors.onKhata, secondary: colors.ink, link: colors.blue }[variant];
+  const textColor = { primary: colors.onBrand, secondary: colors.brand, link: colors.brand }[variant];
 
   return (
     <Pressable

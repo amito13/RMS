@@ -24,9 +24,7 @@ export default function Settings() {
   }
 
   return (
-    <Screen edges={['top']}>
-      <Text variant="title">Settings</Text>
-
+    <Screen bottomInset={false} header={{ title: 'Settings' }}>
       <View style={[styles.section, { borderColor: colors.rule }]}>
         <Text variant="caption" tone="inkMuted">
           Signed in as
@@ -37,7 +35,7 @@ export default function Settings() {
       <View style={styles.actions}>
         <Button title="Sign out" variant="secondary" onPress={handleSignOut} loading={signingOut} />
         {error ? (
-          <Text variant="caption" tone="khata">
+          <Text variant="caption" tone="overdue">
             {error}
           </Text>
         ) : null}
@@ -52,7 +50,6 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: space.xl,
     paddingVertical: space.lg,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderBottomWidth: StyleSheet.hairlineWidth,

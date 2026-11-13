@@ -3,7 +3,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AuthHeader } from '@/components/auth/auth-header';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
@@ -40,23 +39,28 @@ export default function ForgotPassword() {
 
   if (sentTo) {
     return (
-      <Screen scroll centered>
-        <AuthHeader
-          title="Check your email"
-          subtitle={`We sent a password reset link to ${sentTo}. Open it on this phone to choose a new password.`}
-        />
+      <Screen
+        scroll
+        header={{
+          overline: 'RMS',
+          wordmark: true,
+          title: 'Check your email',
+          subtitle: `We sent a password reset link to ${sentTo}. Open it on this phone to choose a new password.`,
+        }}>
         <Button title="Back to sign in" variant="secondary" onPress={() => router.back()} />
       </Screen>
     );
   }
 
   return (
-    <Screen scroll centered>
-      <AuthHeader
-        title="Reset your password"
-        subtitle="We'll email you a link to choose a new password."
-      />
-
+    <Screen
+      scroll
+      header={{
+        overline: 'RMS',
+        wordmark: true,
+        title: 'Reset your password',
+        subtitle: "We'll email you a link to choose a new password.",
+      }}>
       <View style={styles.form}>
         <TextField
           label="Email"
@@ -72,7 +76,7 @@ export default function ForgotPassword() {
         />
 
         {error ? (
-          <Text variant="caption" tone="khata" accessibilityLiveRegion="polite">
+          <Text variant="caption" tone="overdue" accessibilityLiveRegion="polite">
             {error}
           </Text>
         ) : null}
