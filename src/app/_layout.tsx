@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
@@ -16,11 +17,14 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <QueryProvider>
-        <RootNavigator />
-      </QueryProvider>
-    </AuthProvider>
+    // Needed for the pinch-to-zoom document viewer.
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <QueryProvider>
+          <RootNavigator />
+        </QueryProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 

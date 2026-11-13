@@ -17,6 +17,11 @@ export default function Done() {
     propertySetup.close();
   }
 
+  function addTenant() {
+    router.replace('/tenants/new');
+    propertySetup.close();
+  }
+
   return (
     <Screen
       scroll
@@ -34,7 +39,8 @@ export default function Done() {
       </Text>
 
       <View style={styles.actions}>
-        <Button title="Go to properties" onPress={goToProperties} />
+        <Button title="Add your first tenant" onPress={addTenant} />
+        <Button title="Go to properties" variant="secondary" onPress={goToProperties} />
         <Button
           title="Add another property"
           variant="secondary"

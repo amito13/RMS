@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
+import { Button } from '@/components/ui/button';
 import { HeaderBand } from '@/components/ui/header-band';
 import { Stamp } from '@/components/ui/stamp';
 import { Text } from '@/components/ui/text';
@@ -124,6 +125,19 @@ function UnitRow({ unit, first }: { unit: UnitOccupancy; first: boolean }) {
               label={`Available from ${formatDate(new Date(unit.available_from + 'T00:00:00'))}`}
             />
           </View>
+        ) : null}
+        {unit.occupancy === 'vacant' ? (
+          <Button
+            title="Add tenant here"
+            variant="link"
+            onPress={() => router.push({ pathname: '/tenants/new', params: { unitId: unit.unit_id } })}
+          />
+        ) : unit.tenancy_id ? (
+          <Button
+            title="Open tenant"
+            variant="link"
+            onPress={() => router.push({ pathname: '/tenants/[id]', params: { id: unit.tenancy_id! } })}
+          />
         ) : null}
       </View>
       <Text variant="amount" align="right">
