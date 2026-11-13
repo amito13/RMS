@@ -11,45 +11,53 @@ type Props = TextInputProps & {
   error?: string;
   /** Shown under the field when there's no error. */
   hint?: string;
+  /** Fixed text before the input, e.g. "₹". */
+  prefix?: string;
 };
 
-export function TextField({ label, error, hint, style, onFocus, onBlur, ...props }: Props) {
+export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, ...props }: Props) {
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
 
   const borderColor = error ? colors.overdue : focused ? colors.brand : colors.rule;
+  const thick = focused || !!error;
 
   return (
     <View style={styles.field}>
       <Text variant="label">{label}</Text>
-      <TextInput
-        placeholderTextColor={colors.inkFaint}
-        selectionColor={colors.brand}
-        accessibilityLabel={label}
-        accessibilityHint={error ?? hint}
-        onFocus={(e) => {
-          setFocused(true);
-          onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setFocused(false);
-          onBlur?.(e);
-        }}
+      <View
         style={[
-          typography.body,
-          styles.input,
+          styles.box,
           {
-            color: colors.ink,
             backgroundColor: colors.surface,
             borderColor,
-            borderWidth: focused || error ? 2 : 1,
+            borderWidth: thick ? 2 : 1,
             // Keep text from shifting when the border thickens.
-            paddingHorizontal: focused || error ? space.md + 1 : space.md + 2,
+            paddingHorizontal: thick ? space.md + 1 : space.md + 2,
           },
-          style,
-        ]}
-        {...props}
-      />
+        ]}>
+        {prefix ? (
+          <Text variant="bodyStrong" tone="inkMuted" style={styles.prefix}>
+            {prefix}
+          </Text>
+        ) : null}
+        <TextInput
+          placeholderTextColor={colors.inkFaint}
+          selectionColor={colors.brand}
+          accessibilityLabel={label}
+          accessibilityHint={error ?? hint}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          style={[typography.body, styles.input, { color: colors.ink }, style]}
+          {...props}
+        />
+      </View>
       {error ? (
         <Text variant="caption" tone="overdue">
           {error}
@@ -65,9 +73,12 @@ export function TextField({ label, error, hint, style, onFocus, onBlur, ...props
 
 const styles = StyleSheet.create({
   field: { gap: space.xs + 2 },
-  input: {
+  box: {
     minHeight: touchTarget + 4,
     borderRadius: radius.control,
-    paddingVertical: space.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+  prefix: { marginRight: space.xs },
+  input: { flex: 1, paddingVertical: space.sm },
 });
