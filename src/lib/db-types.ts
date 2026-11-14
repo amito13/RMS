@@ -191,6 +191,57 @@ export type NoteRow = {
   created_at: string;
 };
 
+export type PaymentRow = {
+  id: string;
+  tenancy_id: string;
+  rent_charge_id: string | null;
+  kind: 'rent' | 'advance';
+  amount: number;
+  paid_on: string;
+  mode: PaymentMode;
+  reference: string | null;
+  note: string | null;
+  voided_at: string | null;
+  void_reason: string | null;
+  created_at: string;
+};
+
+export type HistoryResult =
+  | 'on_time'
+  | 'late_promise_kept'
+  | 'late'
+  | 'promised'
+  | 'waived'
+  | 'unpaid'
+  | 'not_due';
+
+/** Row of the rent_charge_history view (balance columns plus these). */
+export type RentChargeHistory = RentChargeBalance & {
+  settled_on: string | null;
+  payment_count: number;
+  was_rescheduled: boolean;
+  result: HistoryResult;
+  days_late: number;
+  promise_kept: boolean | null;
+};
+
+/** Row of the tenancy_payment_stats view. */
+export type TenancyPaymentStats = {
+  tenancy_id: string;
+  months_counted: number;
+  months_on_time: number;
+  months_late: number;
+  average_days_late: number;
+  longest_days_late: number;
+  longest_delay_month: string | null;
+  promises_made: number;
+  promises_kept: number;
+  total_paid: number;
+  total_paid_this_financial_year: number;
+  total_waived: number;
+  payment_habit: 'usually_on_time' | 'sometimes_late' | 'often_late' | null;
+};
+
 export type NewTenantInput = {
   tenant: {
     full_name: string;

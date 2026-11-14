@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Linking, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { HeaderBand } from '@/components/ui/header-band';
 import { Stamp } from '@/components/ui/stamp';
 import { Text } from '@/components/ui/text';
+import { PaymentHistorySection } from '@/features/money/payment-history';
 import { DocumentsSection } from '@/features/tenants/documents-section';
 import { NotesSection } from '@/features/tenants/notes-section';
 import { useRentCharges, useTenancySummary, useTenant } from '@/features/tenants/queries';
@@ -103,6 +104,24 @@ export default function TenantScreen() {
 
         <Money t={t} />
 
+        {t.status !== 'ended' ? (
+          <View style={styles.moneyActions}>
+            <Button
+              title={t.outstanding > 0 ? `Record payment (${formatINR(t.outstanding)} owed)` : 'Record payment'}
+              onPress={() => router.push({ pathname: '/pay', params: { tenancyId: t.tenancy_id } })}
+            />
+            {t.advance_pending > 0 ? (
+              <Button
+                title={`Record advance (${formatINR(t.advance_pending)} pending)`}
+                variant="link"
+                onPress={() =>
+                  router.push({ pathname: '/pay', params: { tenancyId: t.tenancy_id, kind: 'advance' } })
+                }
+              />
+            ) : null}
+          </View>
+        ) : null}
+
         <View style={styles.section}>
           <Text variant="heading">Rent by month</Text>
           {charges.data?.length === 0 ? (
@@ -114,7 +133,19 @@ export default function TenantScreen() {
             const s = chargeStamp(c);
             const moved = c.due_date !== c.original_due_date;
             return (
-              <View key={c.rent_charge_id} style={[styles.ledgerRow, { borderColor: colors.rule }, i === 0 && styles.firstRow]}>
+              <Pressable
+                key={c.rent_charge_id}
+                accessibilityRole="button"
+                accessibilityHint="Opens this month: payments, move the date, waive"
+                onPress={() =>
+                  router.push({ pathname: '/rent-month', params: { tenancyId: t.tenancy_id, chargeId: c.rent_charge_id } })
+                }
+                style={({ pressed }) => [
+                  styles.ledgerRow,
+                  { borderColor: colors.rule },
+                  i === 0 && styles.firstRow,
+                  pressed && { backgroundColor: colors.surface },
+                ]}>
                 <View style={styles.flex}>
                   <Text variant="bodyStrong">{formatMonth(parseDay(c.period_month))}</Text>
                   <Text variant="caption" tone="inkMuted">
@@ -129,10 +160,12 @@ export default function TenantScreen() {
                   </Text>
                   <Stamp label={s.label} tone={s.tone} />
                 </View>
-              </View>
+              </Pressable>
             );
           })}
         </View>
+
+        <PaymentHistorySection tenancyId={t.tenancy_id} asOf={t.as_of} />
 
         <View style={styles.section}>
           <Text variant="heading">Agreement</Text>
@@ -259,6 +292,7 @@ const styles = StyleSheet.create({
   stamps: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, alignItems: 'center', marginBottom: -space.md },
   latestNote: { borderLeftWidth: 3, paddingLeft: space.md, gap: 2 },
   contact: { flexDirection: 'row', gap: space.sm },
+  moneyActions: { gap: space.xs, marginTop: -space.lg },
   section: { gap: space.sm },
   ledgerRow: {
     flexDirection: 'row',
