@@ -1,86 +1,71 @@
-import { SymbolView } from 'expo-symbols';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { space, useTheme } from '@/theme';
 
+import { IconButton, icons } from './icon-button';
 import { Text } from './text';
 
 export type HeaderBandProps = {
-  /** Shows a "Back" button above the title. */
+  /** Shows a round back button above the title. */
   onBack?: () => void;
+  /** Use a close (×) icon instead of a back arrow, for modals. */
+  close?: boolean;
   title: string;
-  /** Small line above the title, e.g. the date or the RMS wordmark. */
+  /** Small line above the title, e.g. the tenant and unit, or "RMS". */
   overline?: string;
-  /** Show the overline as the gold RMS wordmark instead of muted text. */
+  /** Show the overline as the spaced-out RMS wordmark. */
   wordmark?: boolean;
   /** One line of context under the title. */
   subtitle?: string;
-  /** Large headline type (Today screen). Defaults to the title size. */
+  /** Large headline type. */
   large?: boolean;
+  /** Pad for the status bar. Off when something is drawn above the header. */
+  inset?: boolean;
 };
 
-/** Emerald band at the top of every screen, running up under the status bar. */
-export function HeaderBand({ title, overline, wordmark, subtitle, large, onBack }: HeaderBandProps) {
+/** Screen header on the paper: round back button, small overline, bold title. */
+export function HeaderBand({ title, overline, wordmark, subtitle, large, onBack, close, inset = true }: HeaderBandProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
-    <View
-      style={[
-        styles.band,
-        { backgroundColor: colors.header, paddingTop: insets.top + (onBack ? space.xs : space.lg) },
-      ]}>
+    <View style={[styles.header, { paddingTop: (inset ? insets.top : 0) + space.md }]}>
       {onBack ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Back"
-          onPress={onBack}
-          hitSlop={space.sm}
-          style={({ pressed }) => [styles.back, pressed && { opacity: 0.7 }]}>
-          <SymbolView
-            name={{ ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' }}
-            tintColor={colors.onHeader}
-            size={22}
-          />
-          <Text variant="label" style={{ color: colors.onHeader }}>
-            Back
-          </Text>
-        </Pressable>
+        <View style={styles.back}>
+          <IconButton icon={close ? icons.close : icons.back} label={close ? 'Close' : 'Back'} onPress={onBack} />
+        </View>
       ) : null}
       {overline ? (
         <Text
-          variant={wordmark ? 'heading' : 'label'}
-          style={[styles.overline, { color: wordmark ? colors.gold : colors.onHeaderMuted }]}>
+          variant="caption"
+          style={[styles.overline, { color: colors.inkMuted }, wordmark && styles.wordmark]}>
           {overline}
         </Text>
       ) : null}
       <Text
-        variant={large ? 'display' : 'title'}
+        variant="title"
         accessibilityRole="header"
-        style={{ color: colors.onHeader }}>
+        style={large ? styles.large : undefined}>
         {title}
       </Text>
       {subtitle ? (
-        <Text style={[styles.subtitle, { color: colors.onHeaderMuted }]}>{subtitle}</Text>
+        <Text tone="inkMuted" style={styles.subtitle}>
+          {subtitle}
+        </Text>
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  band: {
-    paddingHorizontal: space.lg,
-    paddingBottom: space.xl,
+  header: {
+    paddingHorizontal: space.lg + space.xs,
+    paddingBottom: space.sm,
   },
-  back: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.xs,
-    alignSelf: 'flex-start',
-    minHeight: 44,
-    marginBottom: space.xs,
-  },
-  overline: { marginBottom: space.xs },
+  back: { alignSelf: 'flex-start', marginBottom: space.lg, marginLeft: -space.xs },
+  overline: { marginBottom: 2 },
+  wordmark: { letterSpacing: 1.4, fontSize: 13 },
+  large: { fontSize: 34, lineHeight: 40, letterSpacing: -0.9 },
   subtitle: { marginTop: space.xs, maxWidth: 520 },
 });

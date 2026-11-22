@@ -2,7 +2,9 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/paper';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { TextField } from '@/components/ui/text-field';
@@ -10,27 +12,43 @@ import { changePassword, deleteAccount, useUpdateProfile } from '@/features/acco
 import { useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/auth-provider';
-import { space, useTheme } from '@/theme';
+import { space } from '@/theme';
 
 const MIN_PASSWORD_LENGTH = 8;
 
 export default function Settings() {
   const { session } = useAuth();
-  const { colors } = useTheme();
   const email = session?.user.email ?? '';
 
   return (
-    <Screen scroll bottomInset={false} header={{ title: 'Settings', subtitle: `Signed in as ${email}` }}>
+    <Screen scroll bottomInset={false} header={{ title: 'Settings' }}>
       <View style={styles.sections}>
+        <AccountCard email={email} />
         <ProfileSection />
         <PasswordSection email={email} />
         <SignOutSection />
         <DeleteSection email={email} userId={session?.user.id ?? ''} />
-        <Text variant="caption" tone="inkFaint" style={{ borderColor: colors.rule }}>
+        <Text variant="caption" tone="inkMuted" align="center">
           RMS {Constants.expoConfig?.version}
         </Text>
       </View>
     </Screen>
+  );
+}
+
+function AccountCard({ email }: { email: string }) {
+  const profile = useProfile();
+  const name = profile.data?.full_name || 'Your account';
+  return (
+    <Card style={styles.account}>
+      <Avatar name={profile.data?.full_name || email} tone="dark" size={56} />
+      <View style={styles.flex}>
+        <Text variant="heading">{name}</Text>
+        <Text variant="caption" tone="inkMuted">
+          {email}
+        </Text>
+      </View>
+    </Card>
   );
 }
 
@@ -64,7 +82,7 @@ function ProfileSection() {
   }
 
   return (
-    <View style={styles.section}>
+    <Card style={styles.section}>
       <Text variant="heading">Your details</Text>
       <TextField label="Your name" value={nameValue} onChangeText={setName} autoCapitalize="words" placeholder="Amit Dewangan" />
       <TextField
@@ -80,7 +98,7 @@ function ProfileSection() {
         </Text>
       ) : null}
       <Button title="Save details" variant="secondary" onPress={save} loading={update.isPending} disabled={!dirty} />
-    </View>
+    </Card>
   );
 }
 
@@ -118,7 +136,7 @@ function PasswordSection({ email }: { email: string }) {
   }
 
   return (
-    <View style={styles.section}>
+    <Card style={styles.section}>
       <Text variant="heading">Password</Text>
       {open ? (
         <>
@@ -144,7 +162,7 @@ function PasswordSection({ email }: { email: string }) {
       ) : (
         <Button title="Change password" variant="secondary" onPress={() => setOpen(true)} />
       )}
-    </View>
+    </Card>
   );
 }
 
@@ -161,14 +179,14 @@ function SignOutSection() {
   }
 
   return (
-    <View style={styles.section}>
+    <Card style={styles.section}>
       <Button title="Sign out" variant="secondary" onPress={signOut} loading={signingOut} />
       {error ? (
         <Text variant="caption" tone="overdue">
           {error}
         </Text>
       ) : null}
-    </View>
+    </Card>
   );
 }
 
@@ -190,7 +208,7 @@ function DeleteSection({ email, userId }: { email: string; userId: string }) {
   }
 
   return (
-    <View style={styles.section}>
+    <Card style={styles.section}>
       <Text variant="heading">Delete account</Text>
       <Text tone="inkMuted">
         Permanently deletes your account, every property, tenant, payment and note, and all uploaded
@@ -218,13 +236,14 @@ function DeleteSection({ email, userId }: { email: string; userId: string }) {
       ) : (
         <Button title="Delete account" variant="link" onPress={() => setOpen(true)} />
       )}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  sections: { gap: space.xxl },
+  sections: { gap: space.lg },
   section: { gap: space.md },
+  account: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   row: { flexDirection: 'row', gap: space.sm },
   flex: { flex: 1 },
 });

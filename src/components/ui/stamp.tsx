@@ -9,52 +9,50 @@ export type StampTone = 'paid' | 'due' | 'late' | 'neutral';
 type Props = {
   label: string;
   tone: StampTone;
-  /** Tilt like a hand-pressed stamp. Use only for the one stamp in a screen header. */
+  /** Kept for older call sites; pills are never tilted. */
   tilted?: boolean;
+  /** Smaller pill for dense rows. */
+  small?: boolean;
 };
 
 /**
- * Rent status as a rubber-stamp impression: a double-ruled outline in stamp
- * ink. The label always names the status, so colour is never the only signal.
+ * Rent status as a pastel pill with a dot. The label always names the
+ * status, so colour is never the only signal.
  */
-export function Stamp({ label, tone, tilted }: Props) {
+export function Stamp({ label, tone, small }: Props) {
   const { colors } = useTheme();
-  const ink = { paid: colors.paid, due: colors.due, late: colors.overdue, neutral: colors.inkMuted }[
-    tone
-  ];
+  const [bg, ink] = {
+    paid: [colors.paidSoft, colors.paid],
+    due: [colors.dueSoft, colors.due],
+    late: [colors.overdueSoft, colors.overdue],
+    neutral: [colors.neutralSoft, '#4A4945'],
+  }[tone];
 
   return (
     <View
       accessible
       accessibilityLabel={label}
-      style={[styles.outer, { borderColor: ink }, tilted && styles.tilted]}>
-      <View style={[styles.inner, { borderColor: ink }]}>
-        <Text style={[styles.label, { color: ink }]} numberOfLines={1}>
-          {label}
-        </Text>
-      </View>
+      style={[styles.pill, small && styles.small, { backgroundColor: bg }]}>
+      {tone !== 'neutral' ? <View style={[styles.dot, { backgroundColor: ink }]} /> : null}
+      <Text style={[styles.label, small && styles.smallLabel, { color: ink }]} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outer: {
+  pill: {
     alignSelf: 'flex-start',
-    borderWidth: 1.5,
-    borderRadius: 4,
-    padding: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    height: 28,
+    paddingHorizontal: 11,
+    borderRadius: 999,
   },
-  inner: {
-    borderWidth: 1,
-    borderRadius: 2,
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-  },
-  label: {
-    fontFamily: fonts.bodyBold,
-    fontSize: 13,
-    lineHeight: 18,
-    letterSpacing: 0.2,
-  },
-  tilted: { transform: [{ rotate: '-3deg' }] },
+  small: { height: 24, paddingHorizontal: 9 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  label: { fontFamily: fonts.bodySemi, fontSize: 12.5, lineHeight: 16 },
+  smallLabel: { fontSize: 11.5 },
 });

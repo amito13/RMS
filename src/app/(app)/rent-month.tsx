@@ -38,7 +38,7 @@ export default function RentMonth() {
 
   if (!t || !c) {
     return (
-      <Screen header={{ onBack: close, title: 'Rent' }}>
+      <Screen header={{ close: true, onBack: close, title: 'Rent' }}>
         <Text tone="inkMuted">{charges.isPending ? 'Loading…' : 'This month wasn’t found.'}</Text>
       </Screen>
     );
@@ -82,7 +82,7 @@ export default function RentMonth() {
     <Screen
       scroll
       header={{
-        onBack: close,
+        close: true, onBack: close,
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: `${formatMonth(parseDay(c.period_month))} rent`,
       }}>

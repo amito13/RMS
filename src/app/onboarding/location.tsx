@@ -40,7 +40,7 @@ export default function Location() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
         onBack: () => (router.canGoBack() ? router.back() : router.replace('/onboarding')),
         overline: 'Step 1 of 3',

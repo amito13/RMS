@@ -4,7 +4,7 @@ import { useTheme } from '@/theme';
 
 // Open on sign-in, not on the first file alphabetically (forgot-password).
 export const unstable_settings = {
-  initialRouteName: 'sign-in',
+  anchor: 'sign-in',
 };
 
 export default function AuthLayout() {

@@ -86,7 +86,7 @@ export default function ResetPassword() {
   if (linkState.status === 'invalid') {
     return (
       <Screen
-        scroll
+        scroll card
         header={{
           overline: 'RMS',
           wordmark: true,
@@ -100,7 +100,7 @@ export default function ResetPassword() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
         overline: 'RMS',
         wordmark: true,

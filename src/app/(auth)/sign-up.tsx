@@ -53,7 +53,8 @@ export default function SignUp() {
   if (sentTo) {
     return (
       <Screen
-        scroll
+        scroll card
+        hero="house"
         header={{
           overline: 'RMS',
           wordmark: true,
@@ -67,7 +68,8 @@ export default function SignUp() {
 
   return (
     <Screen
-      scroll
+      scroll card
+      hero="house"
       header={{
         overline: 'RMS',
         wordmark: true,

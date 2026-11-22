@@ -43,7 +43,7 @@ export default function MoveDate() {
   const [error, setError] = useState<string | null>(null);
   const chosen = date ?? (isRenewal ? earliest : current);
 
-  if (!t) return <Screen header={{ onBack: () => router.back(), title: 'Move date' }} />;
+  if (!t) return <Screen header={{ close: true, onBack: () => router.back(), title: 'Move date' }} />;
 
   async function save() {
     setError(null);
@@ -67,9 +67,9 @@ export default function MoveDate() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: isRenewal ? 'Move renewal date' : 'Change move-out date',
         subtitle: `${isRenewal ? 'Renewal' : 'Leaving'} on ${full(current)} now`,

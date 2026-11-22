@@ -36,7 +36,7 @@ export default function EndTenancy() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Settlement | null>(null);
 
-  if (!t) return <Screen header={{ onBack: () => router.back(), title: 'End tenancy' }} />;
+  if (!t) return <Screen header={{ close: true, onBack: () => router.back(), title: 'End tenancy' }} />;
 
   if (result) {
     return (
@@ -88,7 +88,7 @@ export default function EndTenancy() {
     <Screen
       scroll
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: 'End tenancy',
         subtitle: planned ? `Planned move-out: ${full(planned)}` : 'No notice was recorded',

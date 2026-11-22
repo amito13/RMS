@@ -64,8 +64,8 @@ function RootNavigator() {
 
   return (
     <>
-      {/* Every screen opens with the emerald header band, so status bar text is always light. */}
-      <StatusBar style="light" />
+      {/* Every screen sits on light paper, so status bar text is dark. */}
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerShown: false,

@@ -1,35 +1,32 @@
-import { AnekLatin_600SemiBold, AnekLatin_700Bold } from '@expo-google-fonts/anek-latin';
 import {
-  Mukta_400Regular,
-  Mukta_500Medium,
-  Mukta_600SemiBold,
-  Mukta_700Bold,
-} from '@expo-google-fonts/mukta';
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
 import { useFonts } from 'expo-font';
 
 /**
- * Anek Latin for amounts and headlines, Mukta for everything else.
- * Both come from an Indian foundry, include the ₹ sign, and have Devanagari
- * versions for when Hindi is added.
+ * Manrope everywhere: extra bold for titles, medium for big amounts (light,
+ * calm numbers), semibold/bold for body and labels. It includes the ₹ sign.
  *
  * Never combine these with `fontWeight`: each weight is its own family.
  */
 export const fonts = {
-  displayBold: 'AnekLatin_700Bold',
-  displaySemi: 'AnekLatin_600SemiBold',
-  body: 'Mukta_400Regular',
-  bodyMedium: 'Mukta_500Medium',
-  bodySemi: 'Mukta_600SemiBold',
-  bodyBold: 'Mukta_700Bold',
+  displayBold: 'Manrope_800ExtraBold',
+  displaySemi: 'Manrope_700Bold',
+  number: 'Manrope_500Medium',
+  body: 'Manrope_500Medium',
+  bodyMedium: 'Manrope_600SemiBold',
+  bodySemi: 'Manrope_700Bold',
+  bodyBold: 'Manrope_800ExtraBold',
 } as const;
 
 export function useAppFonts() {
   return useFonts({
-    AnekLatin_600SemiBold,
-    AnekLatin_700Bold,
-    Mukta_400Regular,
-    Mukta_500Medium,
-    Mukta_600SemiBold,
-    Mukta_700Bold,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
   });
 }

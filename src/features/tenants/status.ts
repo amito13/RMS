@@ -1,3 +1,4 @@
+import type { AvatarTone } from '@/components/ui/avatar';
 import type { StampTone } from '@/components/ui/stamp';
 import type { ChargeStatus, RentChargeBalance, TenancySummary } from '@/lib/db-types';
 import { parseDay } from '@/lib/dates';
@@ -25,6 +26,13 @@ export function rentStamp(t: TenancySummary): StampInfo {
     default:
       return { label: 'Paid', tone: 'paid' };
   }
+}
+
+/** Avatar tint that matches the rent stamp (blue for upcoming). */
+export function avatarTone(t: TenancySummary): AvatarTone {
+  const tone = rentStamp(t).tone;
+  if (t.status === 'ended') return 'neutral';
+  return tone === 'neutral' ? 'info' : tone;
 }
 
 /** The amount that matters right now: what's owed, else the next rent. */

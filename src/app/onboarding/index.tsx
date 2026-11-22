@@ -21,6 +21,7 @@ export default function Welcome() {
   return (
     <Screen
       scroll
+      hero="street"
       header={{
         overline: 'RMS',
         wordmark: true,

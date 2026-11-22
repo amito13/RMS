@@ -40,7 +40,7 @@ export default function ForgotPassword() {
   if (sentTo) {
     return (
       <Screen
-        scroll
+        scroll card
         header={{
           overline: 'RMS',
           wordmark: true,
@@ -54,7 +54,7 @@ export default function ForgotPassword() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
         overline: 'RMS',
         wordmark: true,

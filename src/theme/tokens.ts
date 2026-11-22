@@ -1,92 +1,101 @@
 /**
- * RMS design tokens: emerald and gold.
+ * RMS design tokens: paper finish.
  *
- * Emerald is the colour of money and trust; gold marks what's due. Each screen
- * opens with an emerald header band, the body sits on warm white, and rent
- * status is shown as a rubber-stamp impression. See docs/design.md.
+ * Warm grey paper with a fine grain, white cards with soft shadows, black pill
+ * buttons and pastel status pills. Illustrated sky-and-house scenes head the
+ * main screens. See docs/design.md.
  */
 
 export type ColorScheme = 'light' | 'dark';
 
 export type Palette = {
-  /** Screen body background. */
+  /** Screen background: warm grey paper. */
   paper: string;
-  /** Raised surfaces: inputs, bottom sheets, tab bar. */
+  /** Cards, sheets and the tab bar. */
   surface: string;
+  /** Inside text inputs. */
+  field: string;
+  /** Muted fills inside cards (stat tiles, segmented controls). */
+  wash: string;
   /** Main text. */
   ink: string;
   /** Secondary text. */
   inkMuted: string;
   /** Placeholders and disabled text. */
   inkFaint: string;
-  /** Hairline rules between rows and around inputs. */
+  /** Borders around inputs and outline buttons. */
   rule: string;
+  /** Dividers between rows inside a card. */
+  hairline: string;
 
-  /** Brand: primary buttons, links, active tab, focus ring. */
+  /** Primary buttons, active tab, selected chips, focus ring. */
   brand: string;
   /** Text and icons on top of a brand-filled button. */
   onBrand: string;
 
-  /** Header band at the top of every screen. */
+  /** Kept for screens that still reference the old header band. */
   header: string;
-  /** Title text on the header band. */
   onHeader: string;
-  /** Secondary text on the header band. */
   onHeaderMuted: string;
-  /** Gold accent on the header band (wordmark). */
+  /** Warm accent: progress, highlights. */
   gold: string;
 
-  /** Paid / received stamp ink. */
+  /** Status text colours (also used for errors: overdue). */
   paid: string;
-  /** Due today / partly paid stamp ink. */
   due: string;
-  /** Overdue stamp ink, and error messages. */
   overdue: string;
+  /** Status pill fills. */
+  paidSoft: string;
+  dueSoft: string;
+  overdueSoft: string;
+  neutralSoft: string;
+  /** Info tint (unit badges, map pins). */
+  info: string;
+  infoSoft: string;
+
+  /** Sky gradient for illustrated headers. */
+  skyTop: string;
+  skyBottom: string;
+};
+
+const light: Palette = {
+  paper: '#ECEBE7',
+  surface: '#FBFAF7',
+  field: '#FFFFFF',
+  wash: '#ECEBE7',
+  ink: '#161616',
+  inkMuted: '#6B6A66',
+  inkFaint: '#8A8882',
+  rule: '#D9D6CF',
+  hairline: '#ECEAE4',
+
+  brand: '#161616',
+  onBrand: '#FFFFFF',
+
+  header: '#ECEBE7',
+  onHeader: '#161616',
+  onHeaderMuted: '#6B6A66',
+  gold: '#F2B98A',
+
+  paid: '#2D6A22',
+  due: '#8A470C',
+  overdue: '#A3281C',
+  paidSoft: '#DCEFD3',
+  dueSoft: '#FBE2C6',
+  overdueSoft: '#F8D5D0',
+  neutralSoft: '#E4E2DC',
+  info: '#2F4F78',
+  infoSoft: '#E3EEF9',
+
+  skyTop: '#A9CBF2',
+  skyBottom: '#DCEAF8',
 };
 
 export const palettes: Record<ColorScheme, Palette> = {
-  light: {
-    paper: '#FAFAF7',
-    surface: '#FFFFFF',
-    ink: '#14201B',
-    inkMuted: '#55625B',
-    inkFaint: '#8B958F',
-    rule: '#E2E5DE',
-
-    brand: '#065F46',
-    onBrand: '#FFFFFF',
-
-    header: '#065F46',
-    onHeader: '#FFFFFF',
-    onHeaderMuted: '#A9D8C6',
-    gold: '#E9C46A',
-
-    // Text-safe shades of the chosen swatches (#059669, #B7791F) so stamp
-    // labels stay readable on warm white (contrast ≥ 4.5:1).
-    paid: '#047857',
-    due: '#8F5E12',
-    overdue: '#B91C1C',
-  },
-  dark: {
-    paper: '#0E1613',
-    surface: '#16211C',
-    ink: '#E6EEE9',
-    inkMuted: '#9DB0A6',
-    inkFaint: '#66776E',
-    rule: '#24322B',
-
-    brand: '#34C79A',
-    onBrand: '#052B1F',
-
-    header: '#0A3D30',
-    onHeader: '#F2F7F4',
-    onHeaderMuted: '#8FC9B3',
-    gold: '#E9C46A',
-
-    paid: '#34D399',
-    due: '#E7B54F',
-    overdue: '#F87171',
-  },
+  light,
+  // The paper finish is a light design; dark mode uses the same palette until
+  // a dark version is designed.
+  dark: light,
 };
 
 /** 4-point spacing scale. */
@@ -100,12 +109,22 @@ export const space = {
   xxxl: 48,
 } as const;
 
-/** Corners follow hierarchy: ledger rows square, controls slightly rounded, sheets well rounded. */
 export const radius = {
   none: 0,
-  control: 6,
-  sheet: 20,
+  /** Inputs and small tiles. */
+  control: 16,
+  /** Cards. */
+  card: 24,
+  /** Hero cards and sheets. */
+  sheet: 30,
+  pill: 999,
 } as const;
 
 /** Minimum touch target, in dp. */
 export const touchTarget = 48;
+
+/** Soft paper shadow for cards. */
+export const cardShadow = '0px 1px 2px rgba(22, 22, 22, 0.05), 0px 12px 28px -14px rgba(22, 22, 22, 0.14)';
+/** Lifted shadow for floating things (tab bar, round buttons). */
+export const floatShadow = '0px 14px 34px -12px rgba(22, 22, 22, 0.30)';
+export const buttonShadow = '0px 1px 2px rgba(22, 22, 22, 0.06), 0px 6px 16px -8px rgba(22, 22, 22, 0.18)';

@@ -36,7 +36,7 @@ export default function RecordNotice() {
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  if (!t) return <Screen header={{ onBack: () => router.back(), title: 'Record notice' }} />;
+  if (!t) return <Screen header={{ close: true, onBack: () => router.back(), title: 'Record notice' }} />;
 
   // Planned move-out follows the notice date until the landlord picks one.
   const planned = moveOut ?? addDays(noticeDate, t.notice_period_days);
@@ -68,9 +68,9 @@ export default function RecordNotice() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: 'Record notice',
         subtitle: `Notice period: ${t.notice_period_days} days`,

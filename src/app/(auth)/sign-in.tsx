@@ -35,7 +35,8 @@ export default function SignIn() {
 
   return (
     <Screen
-      scroll
+      scroll card
+      hero="house"
       header={{
         overline: 'RMS',
         wordmark: true,

@@ -25,6 +25,7 @@ export default function Done() {
   return (
     <Screen
       scroll
+      hero="house"
       header={{
         overline: 'Property saved',
         title: `${name || 'Your property'} is set up`,

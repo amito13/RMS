@@ -62,7 +62,7 @@ export default function RecordPayment() {
   const [excess, setExcess] = useState<number | null>(null);
 
   if (!t) {
-    return <Screen header={{ onBack: () => router.back(), title: 'Record payment' }} />;
+    return <Screen header={{ close: true, onBack: () => router.back(), title: 'Record payment' }} />;
   }
 
   const amount = amountInput ?? (defaultAmount ? String(defaultAmount) : '');
@@ -112,9 +112,9 @@ export default function RecordPayment() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: charge ? `${monthName} rent` : 'Record payment',
         subtitle:

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
-import { radius, space, touchTarget, typography, useTheme } from '@/theme';
+import { radius, space, typography, useTheme } from '@/theme';
 
 import { useRevealFocusedInput } from './keyboard-scroll';
 import { Text } from './text';
@@ -21,21 +21,23 @@ export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, 
   const [focused, setFocused] = useState(false);
   const reveal = useRevealFocusedInput();
 
-  const borderColor = error ? colors.overdue : focused ? colors.brand : colors.rule;
+  const borderColor = error ? colors.overdue : focused ? colors.ink : colors.rule;
   const thick = focused || !!error;
 
   return (
     <View style={styles.field}>
-      <Text variant="label">{label}</Text>
+      <Text variant="label" style={{ color: '#3A3936', fontSize: 13 }}>
+        {label}
+      </Text>
       <View
         style={[
           styles.box,
           {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.field,
             borderColor,
             borderWidth: thick ? 2 : 1,
             // Keep text from shifting when the border thickens.
-            paddingHorizontal: thick ? space.md + 1 : space.md + 2,
+            paddingHorizontal: thick ? space.lg - 1 : space.lg,
           },
         ]}>
         {prefix ? (
@@ -45,7 +47,8 @@ export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, 
         ) : null}
         <TextInput
           placeholderTextColor={colors.inkFaint}
-          selectionColor={colors.brand}
+          selectionColor={colors.ink}
+          cursorColor={colors.ink}
           accessibilityLabel={label}
           accessibilityHint={error ?? hint}
           onFocus={(e) => {
@@ -57,7 +60,7 @@ export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, 
             setFocused(false);
             onBlur?.(e);
           }}
-          style={[typography.body, styles.input, { color: colors.ink }, style]}
+          style={[typography.bodyStrong, styles.input, { color: colors.ink }, style]}
           {...props}
         />
       </View>
@@ -77,11 +80,11 @@ export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, 
 const styles = StyleSheet.create({
   field: { gap: space.xs + 2 },
   box: {
-    minHeight: touchTarget + 4,
+    minHeight: 54,
     borderRadius: radius.control,
     flexDirection: 'row',
     alignItems: 'center',
   },
   prefix: { marginRight: space.xs },
-  input: { flex: 1, paddingVertical: space.sm },
+  input: { flex: 1, paddingVertical: space.sm, fontSize: 16 },
 });

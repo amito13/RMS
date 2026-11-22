@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet } from 'react-native';
 
-import { radius, space, useTheme } from '@/theme';
+import { space, useTheme } from '@/theme';
 
 import { Text } from './text';
 
@@ -10,7 +10,7 @@ type Props = {
   onPress: () => void;
 };
 
-/** A single-choice option, e.g. a unit type. Selected chips fill with brand green. */
+/** A single-choice option, e.g. a unit type. Selected chips fill black. */
 export function Chip({ label, selected, onPress }: Props) {
   const { colors } = useTheme();
   return (
@@ -22,12 +22,12 @@ export function Chip({ label, selected, onPress }: Props) {
       style={({ pressed }) => [
         styles.chip,
         {
-          backgroundColor: selected ? colors.brand : colors.surface,
+          backgroundColor: selected ? colors.brand : colors.field,
           borderColor: selected ? colors.brand : colors.rule,
         },
         pressed && styles.pressed,
       ]}>
-      <Text variant="label" style={{ color: selected ? colors.onBrand : colors.ink }}>
+      <Text variant="label" style={{ color: selected ? colors.onBrand : colors.ink, fontSize: 13.5 }}>
         {label}
       </Text>
     </Pressable>
@@ -37,8 +37,8 @@ export function Chip({ label, selected, onPress }: Props) {
 const styles = StyleSheet.create({
   chip: {
     minHeight: 40,
-    paddingHorizontal: space.md + 2,
-    borderRadius: radius.control,
+    paddingHorizontal: space.lg,
+    borderRadius: 999,
     borderWidth: 1,
     justifyContent: 'center',
   },

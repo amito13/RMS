@@ -25,7 +25,7 @@ export default function EditTenant() {
   const tenant = useTenant(summary.data?.tenant_id);
 
   if (!summary.data || !tenant.data) {
-    return <Screen header={{ onBack: () => router.back(), title: 'Edit details' }} />;
+    return <Screen header={{ close: true, onBack: () => router.back(), title: 'Edit details' }} />;
   }
   return <EditForm t={summary.data} tenant={tenant.data} />;
 }
@@ -100,7 +100,7 @@ function EditForm({ t, tenant }: { t: TenancySummary; tenant: Tenant }) {
   const ended = t.status === 'ended';
 
   return (
-    <Screen scroll header={{ onBack: () => router.back(), overline: `${t.unit_name}, ${t.property_name}`, title: 'Edit details' }}>
+    <Screen scroll card header={{ close: true, onBack: () => router.back(), overline: `${t.unit_name}, ${t.property_name}`, title: 'Edit details' }}>
       <View style={styles.form}>
         <Text variant="heading">Tenant</Text>
         <TextField label="Full name" value={f.full_name} onChangeText={(v) => set({ full_name: v })} autoCapitalize="words" error={errors.full_name} />

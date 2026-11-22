@@ -1,18 +1,21 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { SymbolView } from 'expo-symbols';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/ui/button';
+import { Avatar } from '@/components/ui/avatar';
 import { ChoiceChips } from '@/components/ui/choice-chips';
-import { HeaderBand } from '@/components/ui/header-band';
+import { IconButton, icons } from '@/components/ui/icon-button';
+import { Card, PaperGrain } from '@/components/ui/paper';
+import { TAB_BAR_SPACE } from '@/components/ui/screen';
 import { Stamp } from '@/components/ui/stamp';
 import { Text } from '@/components/ui/text';
-import { TextField } from '@/components/ui/text-field';
 import { useTenancySummaries } from '@/features/tenants/queries';
-import { daysUntil, headlineAmount, rentStamp } from '@/features/tenants/status';
+import { avatarTone, daysUntil, headlineAmount, rentStamp } from '@/features/tenants/status';
 import type { TenancySummary } from '@/lib/db-types';
 import { formatINR } from '@/lib/format';
-import { space, useTheme } from '@/theme';
+import { radius, space, typography, useTheme } from '@/theme';
 
 type Filter = 'all' | 'overdue' | 'week' | 'advance' | 'verify' | 'leaving' | 'moved_out';
 
@@ -58,6 +61,7 @@ function compare(a: TenancySummary, b: TenancySummary) {
 
 export default function Tenants() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const summaries = useTenancySummaries();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
@@ -79,9 +83,12 @@ export default function Tenants() {
   }, [summaries.data, query, filter]);
 
   const hasAny = (summaries.data ?? []).some((t) => t.status !== 'ended');
+  const living = (summaries.data ?? []).filter((t) => t.status !== 'ended').length;
+  const leaving = (summaries.data ?? []).filter((t) => t.status === 'on_notice').length;
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.paper }]}>
+      <PaperGrain />
       <FlatList
         data={list}
         keyExtractor={(t) => t.tenancy_id}
@@ -97,23 +104,41 @@ export default function Tenants() {
           />
         }
         ListHeaderComponent={
-          <>
-            <HeaderBand title="Tenants" />
-            <View style={styles.controls}>
-              <TextField
-                label="Search"
+          <View style={[styles.controls, { paddingTop: insets.top + space.lg }]}>
+            <View style={styles.titleRow}>
+              <View style={styles.flex}>
+                <Text variant="title" accessibilityRole="header">
+                  Tenants
+                </Text>
+                {hasAny ? (
+                  <Text variant="caption" tone="inkMuted">
+                    {living} living{leaving ? ` · ${leaving} moving out` : ''}
+                  </Text>
+                ) : null}
+              </View>
+              <IconButton icon={icons.add} label="Add tenant" filled size={48} onPress={() => router.push('/tenants/new')} />
+            </View>
+            <View style={[styles.search, { backgroundColor: colors.surface, borderColor: colors.rule }]}>
+              <SymbolView name={icons.search} tintColor={colors.inkMuted} size={20} />
+              <TextInput
+                accessibilityLabel="Search tenants"
                 value={query}
                 onChangeText={setQuery}
                 placeholder="Name, phone or unit"
+                placeholderTextColor={colors.inkFaint}
+                selectionColor={colors.ink}
                 autoCorrect={false}
                 returnKeyType="search"
+                style={[typography.bodyStrong, styles.searchInput, { color: colors.ink }]}
               />
+            </View>
+            <View style={styles.chips}>
               <ChoiceChips options={FILTERS} value={filter} onChange={setFilter} />
             </View>
-          </>
+          </View>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
+          <Card style={styles.empty}>
             {summaries.isPending ? (
               <ActivityIndicator color={colors.brand} accessibilityLabel="Loading tenants" />
             ) : summaries.isError && !summaries.data ? (
@@ -131,20 +156,18 @@ export default function Tenants() {
             ) : (
               <Text tone="inkMuted">No tenants match. Try another search or filter.</Text>
             )}
-          </View>
+          </Card>
         }
-        renderItem={({ item, index }) => <TenantRow t={item} first={index === 0} />}
+        renderItem={({ item, index }) => (
+          <TenantRow t={item} first={index === 0} last={index === list.length - 1} />
+        )}
         contentContainerStyle={styles.listContent}
       />
-
-      <View style={[styles.addBar, { backgroundColor: colors.paper, borderColor: colors.rule }]}>
-        <Button title="Add tenant" onPress={() => router.push('/tenants/new')} />
-      </View>
     </View>
   );
 }
 
-function TenantRow({ t, first }: { t: TenancySummary; first: boolean }) {
+function TenantRow({ t, first, last }: { t: TenancySummary; first: boolean; last: boolean }) {
   const { colors } = useTheme();
   const stamp = rentStamp(t);
   const money = headlineAmount(t);
@@ -161,10 +184,12 @@ function TenantRow({ t, first }: { t: TenancySummary; first: boolean }) {
       onPress={() => router.push({ pathname: '/tenants/[id]', params: { id: t.tenancy_id } })}
       style={({ pressed }) => [
         styles.row,
-        { borderColor: colors.rule },
+        { backgroundColor: colors.surface, borderColor: colors.hairline },
         first && styles.firstRow,
-        pressed && { backgroundColor: colors.surface },
+        last ? styles.lastRow : { borderBottomWidth: 1 },
+        pressed && { backgroundColor: colors.wash },
       ]}>
+      <Avatar name={t.tenant_name} tone={avatarTone(t)} />
       <View style={styles.flex}>
         <Text variant="bodyStrong">{t.tenant_name}</Text>
         <Text variant="caption" tone="inkMuted">
@@ -177,10 +202,10 @@ function TenantRow({ t, first }: { t: TenancySummary; first: boolean }) {
         ) : null}
       </View>
       <View style={styles.side}>
-        <Text variant="amount" align="right" tone={t.overdue_amount > 0 ? 'overdue' : 'ink'}>
+        <Text variant="amount" align="right">
           {formatINR(money.amount)}
         </Text>
-        <Stamp label={stamp.label} tone={stamp.tone} />
+        <Stamp label={stamp.label} tone={stamp.tone} small />
       </View>
     </Pressable>
   );
@@ -188,26 +213,30 @@ function TenantRow({ t, first }: { t: TenancySummary; first: boolean }) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  controls: { paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.md, gap: space.md },
-  listContent: { paddingBottom: 96 },
-  empty: { paddingHorizontal: space.lg, paddingVertical: space.xl, gap: space.xs },
+  controls: { paddingHorizontal: space.lg, paddingBottom: space.lg, gap: space.lg },
+  titleRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.xs },
+  search: {
+    height: 52,
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm + 2,
+    paddingHorizontal: 18,
+  },
+  searchInput: { flex: 1, fontSize: 15, paddingVertical: 0 },
+  chips: { marginRight: -space.lg },
+  listContent: { paddingBottom: TAB_BAR_SPACE },
+  empty: { marginHorizontal: space.lg, gap: space.xs },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
     marginHorizontal: space.lg,
-    paddingVertical: space.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
   },
-  firstRow: { borderTopWidth: StyleSheet.hairlineWidth },
+  firstRow: { borderTopLeftRadius: radius.card, borderTopRightRadius: radius.card },
+  lastRow: { borderBottomLeftRadius: radius.card, borderBottomRightRadius: radius.card },
   side: { alignItems: 'flex-end', gap: space.xs },
-  addBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
 });

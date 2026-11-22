@@ -38,7 +38,7 @@ export default function Renew() {
   const [rentFrom, setRentFrom] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  if (!t) return <Screen header={{ onBack: () => router.back(), title: 'Renew agreement' }} />;
+  if (!t) return <Screen header={{ close: true, onBack: () => router.back(), title: 'Renew agreement' }} />;
 
   const startDate = start ?? defaultStart;
   const months = term ?? t.agreement_term_months ?? 11;
@@ -68,9 +68,9 @@ export default function Renew() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: 'Renew agreement',
         subtitle: t.agreement_end_date ? `Current agreement ends ${full(parseDay(t.agreement_end_date))}` : undefined,

@@ -42,7 +42,7 @@ export default function Reschedule() {
 
   if (!t || !c) {
     return (
-      <Screen header={{ onBack: () => router.back(), title: 'Move due date' }}>
+      <Screen header={{ close: true, onBack: () => router.back(), title: 'Move due date' }}>
         <Text tone="inkMuted">{charges.isPending ? 'Loading…' : 'This month wasn’t found.'}</Text>
       </Screen>
     );
@@ -69,9 +69,9 @@ export default function Reschedule() {
 
   return (
     <Screen
-      scroll
+      scroll card
       header={{
-        onBack: () => router.back(),
+        close: true, onBack: () => router.back(),
         overline: `${t.tenant_name}, ${t.unit_name}`,
         title: `Move ${month} rent`,
         subtitle: `${formatINR(c.outstanding)} due on ${formatDate(parseDay(c.due_date))}${
