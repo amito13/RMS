@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { radius, space, touchTarget, typography, useTheme } from '@/theme';
 
+import { useRevealFocusedInput } from './keyboard-scroll';
 import { Text } from './text';
 
 type Props = TextInputProps & {
@@ -18,6 +19,7 @@ type Props = TextInputProps & {
 export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, ...props }: Props) {
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
+  const reveal = useRevealFocusedInput();
 
   const borderColor = error ? colors.overdue : focused ? colors.brand : colors.rule;
   const thick = focused || !!error;
@@ -48,6 +50,7 @@ export function TextField({ label, error, hint, prefix, style, onFocus, onBlur, 
           accessibilityHint={error ?? hint}
           onFocus={(e) => {
             setFocused(true);
+            reveal();
             onFocus?.(e);
           }}
           onBlur={(e) => {

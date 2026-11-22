@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
+import { RevealingTextInput } from '@/components/ui/keyboard-scroll';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useCreateProperty } from '@/features/properties/queries';
@@ -108,7 +109,7 @@ export default function Review() {
       </View>
       {units.map((u, i) => (
         <View key={i} style={[styles.unitRow, { borderColor: colors.rule }]}>
-          <TextInput
+          <RevealingTextInput
             value={u.name}
             onChangeText={(v) => setUnit(i, { name: v })}
             accessibilityLabel={`Name of unit ${i + 1}`}
@@ -117,13 +118,13 @@ export default function Review() {
           />
           <View style={[styles.rentCol, styles.rentBox, inputColors(colors)]}>
             <Text tone="inkMuted">₹</Text>
-            <TextInput
+            <RevealingTextInput
               value={u.monthly_rent ? String(u.monthly_rent) : ''}
               onChangeText={(v) =>
                 setUnit(i, { monthly_rent: Number(v.replace(/\D/g, '').slice(0, 7)) || 0 })
               }
               keyboardType="number-pad"
-              accessibilityLabel={`Monthly rent for ${u.name || `unit ${i + 1}`}`}
+                accessibilityLabel={`Monthly rent for ${u.name || `unit ${i + 1}`}`}
               selectionColor={colors.brand}
               style={[typography.amount, styles.rentInput, { color: colors.ink }]}
             />

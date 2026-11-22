@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { HeaderBand } from '@/components/ui/header-band';
 import { Stamp } from '@/components/ui/stamp';
 import { Text } from '@/components/ui/text';
+import { LeavingSection } from '@/features/lifecycle/leaving-section';
 import { PaymentHistorySection } from '@/features/money/payment-history';
 import { DocumentsSection } from '@/features/tenants/documents-section';
 import { NotesSection } from '@/features/tenants/notes-section';
@@ -181,7 +182,27 @@ export default function TenantScreen() {
           ) : null}
           <Row label="Notice period" value={`${t.notice_period_days} days`} />
           <Row label="Rent" value={`${formatINR(t.monthly_rent)}, due on day ${t.rent_due_day}`} />
+          {t.status === 'active' ? (
+            <View style={styles.sectionActions}>
+              <Button
+                title="Renew agreement"
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/renew', params: { tenancyId: t.tenancy_id } })}
+              />
+              {t.agreement_id ? (
+                <Button
+                  title="Move renewal date"
+                  variant="link"
+                  onPress={() =>
+                    router.push({ pathname: '/move-date', params: { tenancyId: t.tenancy_id, what: 'renewal' } })
+                  }
+                />
+              ) : null}
+            </View>
+          ) : null}
         </View>
+
+        <LeavingSection t={t} />
 
         <DocumentsSection tenantId={t.tenant_id} />
 
@@ -203,6 +224,11 @@ export default function TenantScreen() {
             />
           ) : null}
           {tenant.data?.aadhaar_last4 ? <Row label="Aadhaar" value={`Ends in ${tenant.data.aadhaar_last4}`} /> : null}
+          <Button
+            title="Edit details"
+            variant="link"
+            onPress={() => router.push({ pathname: '/edit-tenant', params: { tenancyId: t.tenancy_id } })}
+          />
         </View>
       </View>
     </ScrollView>
@@ -294,6 +320,7 @@ const styles = StyleSheet.create({
   contact: { flexDirection: 'row', gap: space.sm },
   moneyActions: { gap: space.xs, marginTop: -space.lg },
   section: { gap: space.sm },
+  sectionActions: { gap: space.xs, marginTop: space.sm },
   ledgerRow: {
     flexDirection: 'row',
     alignItems: 'center',

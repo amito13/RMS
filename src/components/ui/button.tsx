@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
 import { radius, space, touchTarget, typography, useTheme } from '@/theme';
 
-type Variant = 'primary' | 'secondary' | 'link';
+type Variant = 'primary' | 'secondary' | 'link' | 'danger';
 
 type Props = {
   title: string;
@@ -18,10 +18,11 @@ export function Button({ title, onPress, variant = 'primary', loading, disabled 
 
   const container = {
     primary: { backgroundColor: colors.brand },
+    danger: { backgroundColor: colors.overdue },
     secondary: { borderWidth: 1.5, borderColor: colors.brand },
     link: { minHeight: undefined, paddingVertical: space.sm, paddingHorizontal: 0 },
   }[variant];
-  const textColor = { primary: colors.onBrand, secondary: colors.brand, link: colors.brand }[variant];
+  const textColor = { primary: colors.onBrand, secondary: colors.brand, link: colors.brand, danger: colors.onBrand }[variant];
 
   return (
     <Pressable

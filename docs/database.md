@@ -229,5 +229,6 @@ flowchart LR
 | `withdraw_notice(tenancy, reason)` | Tenant stays; tenancy active again |
 | `end_tenancy(tenancy, move_out_date, use_advance, waive_remaining, reason)` | Settles with advance, ends tenancy, frees the unit |
 | `generate_rent_charges(tenancy?)` | Creates upcoming monthly rent; daily via pg_cron, and on app open |
+| `delete_my_account()` | Deletes the signed-in landlord's account; every table cascades. The app deletes their storage files first. |
 
 Helpers used inside them: `landlord_today`, `due_date_in_month`, `format_day`, `add_system_note`, `remove_charges_after`.

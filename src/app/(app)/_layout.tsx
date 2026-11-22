@@ -15,6 +15,11 @@ export default function AppLayout() {
       <Stack.Screen name="pay" options={{ presentation: 'modal' }} />
       <Stack.Screen name="rent-month" options={{ presentation: 'modal' }} />
       <Stack.Screen name="reschedule" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="renew" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="move-date" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="notice" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="end-tenancy" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="edit-tenant" options={{ presentation: 'modal' }} />
       <Stack.Screen name="document-viewer" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
     </Stack>
   );
